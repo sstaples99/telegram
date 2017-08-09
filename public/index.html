@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Meta Data -->
+        <title>Telegram CMS</title>
+        <base href='/'>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width" />
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="/css/normalize.css">
+        <link href="https://fonts.googleapis.com/css?family=Great+Vibes|Montserrat:100,200i,400|Open+Sans:300,400|Secular+One|Suez+One" rel="stylesheet">
+        <link href='/lib/animate.css/animate.min.css' rel='stylesheet'>
+        <link href="/lib/sweetalert/sweetalert.css" rel="stylesheet">
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="/css/home.css">
+        <!-- Scripts -->
+        <script type='text/javascript' src='/lib/jquery/jquery.min.js'></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    </head>
+    <body ng-app="telegram" ng-controller="HomeController">
+
+      <div id="primary" class='container'>
+          <div ng-view></div>
+      </div>
+
+    </body>
+</html>
+<!-- load library scripts -->
+<script type="text/javascript" src="/lib/sweetalert/sweetalert.min.js"></script>
+<script src='/lib/angular/angular.min.js'></script>
+<script src='/lib/angular/angular-route.min.js'></script>
+<script src='/lib/angular/angular-messages.min.js'></script>
+<!-- angular initialization -->
+<script type='text/javascript'>
+    (function() {
+        var app = angular.module('telegram', ['ngRoute']);
+        app.config(['$routeProvider','$locationProvider', function($routeProvider, $locationProvider){
+            $routeProvider
+                .when('/', {
+                    templateUrl: '/views/login.html',
+                    controller: 'LoginController'
+                })
+                 .when('/dashboard', {
+                     templateUrl: '/views/dash.html',
+                     controller: 'DashController'
+                 })
+                // .when('/menus', {
+                //   templateUrl: '/views/menus.html',
+                //   controller: 'DashController'
+                // })
+                // .when('/photos', {
+                //     templateUrl: '/views/photos.html',
+                //     controller: 'DashController'
+                // })
+                // .when('/parties', {
+                //     templateUrl: '/views/parties.html',
+                //     controller: 'DashController'
+                // })
+                // .when('/logs', {
+                //   templateUrl: '/views/logs.html',
+                //   controller: 'DashController'
+                // })
+                .otherwise({
+                  redirectTo: '/'
+                });
+                $locationProvider.html5Mode(true);
+        }]);
+
+        app.filter('iif', function () {
+           return function(input, trueValue, falseValue) {
+                return input ? trueValue : falseValue;
+           };
+        });
+    }());
+
+</script>
+<!-- load angular controllers -->
+<script type="text/javascript" src="/js/controllers/login.js"></script>
+<script type="text/javascript" src="/js/controllers/home.js"></script>
+<script type="text/javascript" src="/js/controllers/dash.js"></script>

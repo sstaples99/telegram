@@ -1,0 +1,16 @@
+<div class="container" ng-init="checkStatus()">
+    <div class="col-2">
+        <div class="org-icon" ng-repeat="org in orgs">
+            <img src="{{org.img}}"/>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="service-tab" ng-repeat="service in pageData.active.org.services">
+            <a ng-click="pageData.active.service='{{service}}"><p>{{service}}</p></a>
+        </div>
+    </div>
+    <div class="col-7">
+        <section id="pageData.active.service"></section>
+    </div>
+    <h1>Hello, World!</h1>
+</div>
