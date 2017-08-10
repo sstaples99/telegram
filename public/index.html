@@ -11,13 +11,14 @@
         <link href="https://fonts.googleapis.com/css?family=Great+Vibes|Montserrat:100,200i,400|Open+Sans:300,400|Secular+One|Suez+One" rel="stylesheet">
         <link href='/lib/animate.css/animate.min.css' rel='stylesheet'>
         <link href="/lib/sweetalert/sweetalert.css" rel="stylesheet">
+        <link href="/lib/datetime/datetime.css" rel="stylesheet">
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="/css/home.css">
         <!-- Scripts -->
         <script type='text/javascript' src='/lib/jquery/jquery.min.js'></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     </head>
-    <body ng-app="telegram" ng-controller="HomeController">
+    <body ng-app="telegram" class="dark-grey" ng-controller="HomeController">
 
       <div id="primary" class='container'>
           <div ng-view></div>
@@ -26,6 +27,7 @@
     </body>
 </html>
 <!-- load library scripts -->
+<script type="text/javascript" src="/lib/datetime/datetime.min.js"></script>
 <script type="text/javascript" src="/lib/sweetalert/sweetalert.min.js"></script>
 <script src='/lib/angular/angular.min.js'></script>
 <script src='/lib/angular/angular-route.min.js'></script>
@@ -40,7 +42,7 @@
                     templateUrl: '/views/login.html',
                     controller: 'LoginController'
                 })
-                 .when('/dashboard', {
+                 .when('/dashboard/:service?', {
                      templateUrl: '/views/dash.html',
                      controller: 'DashController'
                  })

@@ -1,16 +1,21 @@
 <div class="container" ng-init="checkStatus()">
-    <div class="col-2">
-        <div class="org-icon" ng-repeat="org in orgs">
-            <img src="{{org.img}}"/>
+    <div class="col-1 dark-grey tall-col inner-shadow" ng-init="pullOrgs()">
+        <div class="org-icon point" ng-click="toggleOrg(org)" ng-repeat="org in userData.orgs">
+            <p class="up">{{org.uniqname | limitTo:1}}</p>
         </div>
     </div>
-    <div class="col-3">
+    <div class="col-2 light-grey tall-col">
+        <div class="org-info">
+            <p>{{pageData.active.org.name}}</p>
+            <p>{{userData.user.name}}</p>
+        </div>
         <div class="service-tab" ng-repeat="service in pageData.active.org.services">
-            <a ng-click="pageData.active.service='{{service}}"><p>{{service}}</p></a>
+            <a ng-click="toggleService(service)"><p class="box fill-width pad-med point cap">{{service}}</p></a>
         </div>
     </div>
-    <div class="col-7">
-        <section id="pageData.active.service"></section>
+    <div class="col-9 white tall-col pad-med box">
+        <section id="pageData.active.service">
+            <div ng-include="'/views/event.html'"></div>
+        </section>
     </div>
-    <h1>Hello, World!</h1>
 </div>

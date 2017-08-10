@@ -1,0 +1,39 @@
+<div>
+    <div class="card-min box" ng-repeat="ev in pageData.content.events">
+        <div class="card-display">
+            <h2 ng-click="toggleCard(ev._id)">{{ev.title}} <span class="text-light pad-left">{{ev.start | dateInMillis | date:'MMM d, y h:mm a'}}</span></h2>
+            <div class="card-tools">
+                <img class="fav" src="/img/icons/fav-active.svg"/>
+                <img class="duplicate" src="/img/icons/dup.svg"/>
+                <img class="delete" src="/img/icons/trash-1.svg"/>
+                <img class="move" src="/img/icons/move.svg"/>
+            </div>
+        </div>
+        <div class="card-edits" id="edits-{{ev._id}}" ng-init="initPickers()">
+            <div class="input-group">
+                <span class="addon">Title</span>
+                <input type="text" class="form-control addon" ng-model="ev.title" ng-blur="updateCard('event', ev)" placeholder="e.g. Live Music"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">Start</span>
+                <input type="text" class="date-time-picker form-control form-50 addon" ng-model="ev.start" ng-blur="updateCard('event', ev)"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">End</span>
+                <input type="text" class="date-time-picker form-control form-50 addon" ng-model="ev.end" ng-blur="updateCard('event', ev)"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">Description</span>
+                <input type="text" class="form-control addon" ng-model="ev.description" ng-blur="updateCard('event', ev)" placeholder="e.g. Classic/alt rock music"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">URL</span>
+                <input type="text" class="form-control addon" ng-model="ev.url" ng-blur="updateCard('event', ev)" placeholder="i.e. link to where event will direct"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">Image SRC</span>
+                <input type="text" class="form-control addon" ng-model="ev.img" ng-blur="updateCard('event', ev)" placeholder="i.e. link to event's display image"/>
+            </div>
+        </div>
+    </div>
+</div>

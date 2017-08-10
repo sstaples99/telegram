@@ -7,7 +7,10 @@
       isLoggedIn: false
     };
 
-    $scope.pageData = {};
+    $scope.pageData = {
+      active: {},
+      content: {}
+    };
 
     $scope.logout = function() {
       $http.get('/backendServices/logout')

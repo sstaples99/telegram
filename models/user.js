@@ -12,7 +12,7 @@ var usersSchema = new Schema({
       level: {type: String, default: 'member'},
       services: {type: Array, default: []}
     },
-    clientID: {type: String, required: true}
+    clientIDs: {type: Array, required: true}
   });
 
 usersSchema.methods.generateHash = function(password) {
