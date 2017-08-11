@@ -1,0 +1,34 @@
+<div class="container" ng-init="initMenus()">
+    <div class="tag-nav box">
+        <p><span ng-repeat="tag in pageData.content.items.uniqMenuTags" ng-class="{active: tag.active}" ng-click="toggleTag(tag)">{{tag.name}}</span></p>
+    </div>
+    <ul class="container" dnd-list="pageData.content.items.data">
+        <li dnd-draggable="item" dnd-moved="pageData.content.items.data.splice($index, 1)" dnd-effect-allowed="move" dnd-selected="models.selected = item"
+            ng-class="{'selected': models.selected === item}" class="card-min box" draggable="true" ng-repeat="item in pageData.content.items.data | filter:tagShown">
+            <h2 ng-click="toggleCard(item._id)">{{item.title}} <span class="text-light pad-left text-small">({{item.price}})</span></h2>
+            <div class="card-tools">
+                <img class="duplicate" src="/img/icons/dup.svg" ng-click="dupCard('item', item)"/>
+                <img class="delete" src="/img/icons/trash-1.svg" ng-click="deleteCard('item', item, $index)"/>
+                <img class="move" src="/img/icons/move.svg"/>
+            </div>
+            <div class="card-edits" id="edits-{{item._id}}" ng-init="initPickers()">
+                <div class="input-group">
+                    <span class="addon">Title</span>
+                    <input type="text" class="form-control addon" ng-model="item.title" ng-blur="updateCard('item', item)" placeholder="e.g. Live Music"/>
+                </div>
+                <div class="input-group">
+                    <span class="addon">Description</span>
+                    <input type="text" class="form-control addon" ng-model="item.description" ng-blur="updateCard('item', item)" placeholder="e.g. Center cut filet in a deep mushroom sauce"/>
+                </div>
+                <div class="input-group">
+                    <span class="addon">Price</span>
+                    <input type="text" class="form-control addon" ng-model="item.price" ng-blur="updateCard('item', item)"/>
+                </div>
+                <div class="input-group">
+                    <span class="addon">Tags</span>
+                    <input type="text" class="form-control addon" ng-model="item.tags" ng-blur="updateCard('item', item)" placeholder="e.g. appetizers, kids menu"/>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>

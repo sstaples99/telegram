@@ -1,11 +1,13 @@
 <div>
-    <div class="card-min box" ng-repeat="ev in pageData.content.events">
+    <img class="icon-small abs-tr" ng-click="createCard('event')" src="/img/icons/new.svg"/>
+    <div class="card-min box" ng-repeat="ev in pageData.content.events.data" ng-if="ev">
         <div class="card-display">
             <h2 ng-click="toggleCard(ev._id)">{{ev.title}} <span class="text-light pad-left">{{ev.start | dateInMillis | date:'MMM d, y h:mm a'}}</span></h2>
             <div class="card-tools">
-                <img class="fav" src="/img/icons/fav-active.svg"/>
-                <img class="duplicate" src="/img/icons/dup.svg"/>
-                <img class="delete" src="/img/icons/trash-1.svg"/>
+                <input id="fav-{{ev._id}}" class="fav" type="checkbox" ng-model="ev.featured" ng-click="updateCard('event', ev)"/>
+                <label for="fav-{{ev._id}}" class="fav"></label>
+                <img class="duplicate" src="/img/icons/dup.svg" ng-click="dupCard('event', ev)"/>
+                <img class="delete" src="/img/icons/trash-1.svg" ng-click="deleteCard('event', ev, $index)"/>
                 <img class="move" src="/img/icons/move.svg"/>
             </div>
         </div>

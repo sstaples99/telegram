@@ -32,10 +32,11 @@
 <script src='/lib/angular/angular.min.js'></script>
 <script src='/lib/angular/angular-route.min.js'></script>
 <script src='/lib/angular/angular-messages.min.js'></script>
+<script type="text/javascript" src="/lib/DragDrop/angular-drag-and-drop-lists.min.js"></script>
 <!-- angular initialization -->
 <script type='text/javascript'>
     (function() {
-        var app = angular.module('telegram', ['ngRoute']);
+        var app = angular.module('telegram', ['ngRoute', 'dndLists']);
         app.config(['$routeProvider','$locationProvider', function($routeProvider, $locationProvider){
             $routeProvider
                 .when('/', {

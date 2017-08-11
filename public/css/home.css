@@ -2,6 +2,9 @@
     margin: 0;
     font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+li {
+    list-style-type: none !important;
+}
 .panel {
     background-color: #ddd;
     border-radius: 10px;
@@ -75,7 +78,6 @@ button.btn-primary {
 .text-light {
     font-weight: 100;
 }
-
 .fill-width {
     width: 100%;
 }
@@ -87,6 +89,9 @@ button.btn-primary {
 }
 .pad-left {
     padding-left: 5px;
+}
+.text-small {
+    font-size: 0.8em;
 }
 .box {
     box-sizing: border-box;
@@ -155,6 +160,7 @@ button.btn-primary {
     padding: 10px 20px;
     cursor: pointer;
     overflow: auto;
+    margin-bottom: 10px;
 }
 .card-min h2 {
     font-size: 1em;
@@ -163,12 +169,6 @@ button.btn-primary {
 }
 .card-tools {
     float: right;
-}
-.card-tools img {
-    float: left;
-    height: 20px;
-    margin-top: 5px;
-    margin-right: 10px;
 }
 .card-edits {
     padding: 20px 10px;
@@ -226,3 +226,57 @@ input.form-control {
     border: 1px solid hsla(31, 15%, 50%, .25);
 }
 
+.card-tools img {
+    float: left;
+    height: 20px;
+    margin-top: 5px;
+    margin-right: 10px;
+}
+label.fav {
+    display: block;
+    background-image: url("/img/icons/fav.svg");
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin-top: 5px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+input.fav:checked + label.fav {
+    background-image: url("/img/icons/fav-active.svg");
+}
+input.fav {
+    display: none;
+}
+
+.tag-nav {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.tag-nav span {
+    padding: 10px;
+    color: #fff;
+    background-color: #acbce1;
+    border-radius: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+span.active {
+    background-color: #6d9aff;
+}
+.split-panel {
+    width: calc(50% - 7.5px);
+    float: left;
+}
+.split-panel:nth-child(2n + 1) {
+    margin-right: 15px;
+}
+
+.icon-small {
+    width: 40px;
+    height: 40px;
+    float: right;
+    margin-bottom:20px;
+    cursor: pointer;
+}

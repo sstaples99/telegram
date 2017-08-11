@@ -15,7 +15,7 @@
     </div>
     <div class="col-9 white tall-col pad-med box">
         <section id="pageData.active.service">
-            <div ng-include="'/views/event.html'"></div>
+            <div ng-if="pageData.active.service" ng-include="'/views/'+pageData.active.service+'.html'"></div>
         </section>
     </div>
 </div>

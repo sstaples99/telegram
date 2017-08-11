@@ -7,6 +7,7 @@ module.exports = function(db, passport) {
     var userSchema = require('../models/user');
     var clientSchema = require('../models/client');
     var eventSchema = require('../models/event');
+    var itemSchema = require('../models/item');
     var flash = require('connect-flash');
     var mg = require('nodemailer-mailgun-transport');
 
@@ -81,6 +82,68 @@ module.exports = function(db, passport) {
            }
         });
     });
+    router.post('/dupEvent', function(req, res) {
+        var dat = JSON.parse(JSON.stringify(req.body));
+        delete dat["_id"];
+        var ev = new eventSchema(dat);
+
+        ev.save(function(err, doc) {
+          if (err) {
+              console.log("Error: (user: ", req.user.name, ") \n", err);
+              res.send({success: false, err: err});
+          } else res.send({success: true, data: doc});
+        });
+    });
+    router.post('/deleteEvent', function(req, res) {
+        eventSchema.find({_id: req.body._id}).remove(function(err, data) {
+            if (err) {
+                console.log(err);
+                res.send({success: false, err: err});
+            }
+            else res.send({success: true, data: req.body});
+        });
+    });
+    router.post('/getMenus', function(req, res) {
+        itemSchema.find({clientID: req.body._id},{},function(err, items) {
+           if (items) {
+               console.log(items);
+               res.send({success: true, data: items});
+           }
+           else {
+               console.log("Error: (user: ", req.user.name, ") \n", err);
+               res.send({success: false, err: err});
+           }
+        });
+    });
+    router.post('/dupItem', function(req, res) {
+        var dat = JSON.parse(JSON.stringify(req.body));
+        delete dat["_id"];
+        var ev = new itemSchema(dat);
+
+        ev.save(function(err, doc) {
+            if (err) {
+                console.log("Error: (user: ", req.user.name, ") \n", err);
+                res.send({success: false, err: err});
+            } else res.send({success: true, data: doc});
+        });
+    });
+    router.post('/deleteItem', function(req, res) {
+        itemSchema.find({_id: req.body._id}).remove(function(err, data) {
+            if (err) {
+                console.log(err);
+                res.send({success: false, err: err});
+            }
+            else res.send({success: true, data: req.body});
+        });
+    });
+    router.post('/createEvent', function(req, res) {
+        console.log("YYAYAYAYAYA KOLOLOLO");
+        var i = new itemSchema({clientID: req.body.clientID});
+        i.save(function(err, doc) {
+            if (err) console.log(err);
+            else res.send({success: true, data: doc});
+        });
+    });
 
     //PUT requests
     router.put("/updateEvent", function(req, res) {
@@ -91,6 +154,15 @@ module.exports = function(db, passport) {
           }
           else res.send({sucess: true, data: doc});
        });
+    });
+    router.put("/updateItem", function(req, res) {
+        itemSchema.findOneAndUpdate({"_id": req.body._id}, req.body, {upsert: true, new: true}, function(err, doc) {
+            if (err) {
+                console.log("Error: (user: ", req.user.name, ") \n", err);
+                res.send({success: false, err: err});
+            }
+            else res.send({sucess: true, data: doc});
+        });
     });
 
     return router;

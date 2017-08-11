@@ -17,7 +17,7 @@
         .then(function(res) {
           $window.location = "/";
         });
-    }
+    };
 
 
   }]);
