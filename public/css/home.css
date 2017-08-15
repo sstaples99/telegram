@@ -280,3 +280,7 @@ span.active {
     margin-bottom:20px;
     cursor: pointer;
 }
+
+.dndDraggingSource {
+    display: none;
+}

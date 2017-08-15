@@ -11,18 +11,18 @@
                 <img class="move" src="/img/icons/move.svg"/>
             </div>
         </div>
-        <div class="card-edits" id="edits-{{ev._id}}" ng-init="initPickers()">
+        <div class="card-edits" id="edits-{{ev._id}}">
             <div class="input-group">
                 <span class="addon">Title</span>
                 <input type="text" class="form-control addon" ng-model="ev.title" ng-blur="updateCard('event', ev)" placeholder="e.g. Live Music"/>
             </div>
             <div class="input-group">
                 <span class="addon">Start</span>
-                <input type="text" class="date-time-picker form-control form-50 addon" ng-model="ev.start" ng-blur="updateCard('event', ev)"/>
+                <input dp-load type="text" class="date-time-picker form-control form-50 addon" ng-model="ev.start" ng-blur="updateCard('event', ev)"/>
             </div>
             <div class="input-group">
                 <span class="addon">End</span>
-                <input type="text" class="date-time-picker form-control form-50 addon" ng-model="ev.end" ng-blur="updateCard('event', ev)"/>
+                <input dp-load type="text" class="date-time-picker form-control form-50 addon" ng-model="ev.end" ng-blur="updateCard('event', ev)"/>
             </div>
             <div class="input-group">
                 <span class="addon">Description</span>

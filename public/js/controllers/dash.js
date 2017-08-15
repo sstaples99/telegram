@@ -53,11 +53,10 @@
             var path = "/backendServices/dup" + p.charAt(0).toUpperCase() + p.slice(1);
             $http.post(path, item)
                 .then(function(res) {
-                   if (res.data.success) {
-                       $scope.pageData.content[p + "s"].data.push(res.data.data);
+                   if (res.data) {
+                       $scope.pageData.content[p + "s"].data.push(res.data);
                    } else {
                        swal("Error", "Unfortunately, the document could not be duplicated", "error");
-                       console.log(res.data.err);
                    }
                 });
         };
@@ -66,8 +65,7 @@
             var path = "/backendServices/create" + p.charAt(0).toUpperCase() + p.slice(1);
             $http.post(path, {"clientID": $scope.pageData.active.org._id})
                 .then(function(res) {
-                    if (res.data.success) $scope.pageData.content[p + "s"].data.push(res.data.data);
-                    else console.log(res.data.err);
+                    if (res.data) $scope.pageData.content[p + "s"].data.push(res.data);
                 });
         };
 
@@ -84,9 +82,8 @@
                 }, function() {
                     $http.post(path, item)
                         .then(function(res) {
-                            if (!res.data.success) {
+                            if (!res.data) {
                                 swal("Error", "Unfortunately, the document could not be deleted", "error");
-                                console.log(res.data.err);
                             } else {
                                 delete $scope.pageData.content[p + "s"].data[idx];
                                 swal("Success", "the " + p + " was deleted", "success");
@@ -145,16 +142,25 @@
             else delete $scope.pageData.content.items.tagsShown[idx];
         };
 
-        $scope.initPickers = function() {
-            $(".date-time-picker").datetimepicker();
-        };
-
         $scope.tagShown = function(tag) {
+            if (tag.tags.length < 1 || typeof(tag.tags === "string")) return true;
             for (var i = 0; i < tag.tags.length; i++) {
                 if ($scope.pageData.content.items.tagsShown.findIndex(function(o) { return o === tag.tags[i]}) > -1) return true;
             }
             return false;
-        }
+        };
+
+        $scope.dropCallback = function(idx, item) {
+            var pidx = $scope.pageData.content.items.placeholder;
+            if (pidx < idx) idx -= 1;
+            if (idx == $scope.pageData.content.items.placeholder) return;
+            var prev = idx > 0 ? $scope.pageData.content.items.data[idx - 1]._id : $scope.pageData.content.items.data[idx].head;
+            var dat = {
+                _id: item._id,
+                prev: prev
+            };
+            $http.post("/backendServices/reorderItem", dat);
+        };
 
 
     }]);
@@ -163,5 +169,14 @@
         return function(dateString) {
             return Date.parse(dateString);
         };
+    });
+
+    app.directive("dpLoad", function() {
+       return {
+           restrict: "A",
+           link: function(scope, el, attrs) {
+               $(el).datetimepicker();
+           }
+       }
     });
 }());
