@@ -10,6 +10,10 @@ module.exports = function(db, passport) {
     var itemSchema = require('../models/item');
     var flash = require('connect-flash');
     var mg = require('nodemailer-mailgun-transport');
+    var multiparty = require('multiparty');
+    var Dropbox = require('dropbox');
+    var dbx = new Dropbox({accessToken: process.env.db_access});
+    var fs = require('fs');
 
     var sortArray = function(oArr) {
         var arr = JSON.parse(JSON.stringify(oArr));
@@ -24,6 +28,8 @@ module.exports = function(db, passport) {
       }
       return arr;
     };
+
+    var schemas = {'item': itemSchema, 'event': eventSchema};
 
     //Passport login methods
     var LocalStrategy = require('passport-local').Strategy;
@@ -173,6 +179,35 @@ module.exports = function(db, passport) {
                 } else res.send({success: true, data: doc});
             });
         });
+    });
+    router.post('/uploadImg', function(req, res) {
+       var form = new multiparty.Form();
+
+       form.parse(req, function(err, fields, files) {
+           fs.readFile(files.file[0].path, function(err, data) {
+               dbx.filesUpload({ path: '/uploads/' + files.file[0].originalFilename, contents: data })
+                   .then(function(dat) {
+                       console.log(dat);
+                       dbx.sharingCreateSharedLink({path: dat.path_lower})
+                           .then(function(dat) {
+                               var url = dat.url;
+                               schemas[fields.schema].findOneAndUpdate({"_id": fields._id}, {img: url.replace("www.dropbox", "dl.dropboxusercontent")}, {upsert: true, new: true}, function(err, doc) {
+                                   if (err) {
+                                       console.log("Error: (user: ", req.user.name, ") \n", err);
+                                       res.end();
+                                   }
+                                   else res.send(doc.img);
+                               });
+                           })
+                           .catch(function(err) {
+                              return res.end();
+                           });
+                   })
+                   .catch(function(err) {
+                       return res.end();
+                   });
+           });
+       });
     });
 
     //PUT requests

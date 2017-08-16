@@ -1,7 +1,7 @@
 (function() {
     var app = angular.module('telegram');
 
-    app.controller('DashController', ["$scope", "$http", "$window", function($scope, $http, $window) {
+    app.controller('DashController', ["$scope", "$http", "$window", "Upload", "$timeout", function($scope, $http, $window, Upload, $timeout) {
 
         $scope.checkStatus = function() {
             $http.get("/backendServices/isLoggedIn")
@@ -85,7 +85,7 @@
                             if (!res.data) {
                                 swal("Error", "Unfortunately, the document could not be deleted", "error");
                             } else {
-                                delete $scope.pageData.content[p + "s"].data[idx];
+                                $scope.pageData.content[p + "s"].data.splice(idx,1);
                                 swal("Success", "the " + p + " was deleted", "success");
                             }
                         });
@@ -121,6 +121,27 @@
                         $scope.pageData.content.items.tagsShown = menuTagsShown;
                     }
                 });
+        };
+
+        $scope.uploadImg = function(item, schema) {
+            var file = item.imgFile;
+            file.upload = Upload.upload({
+                url: "/backendServices/uploadImg",
+                data: {file: file, _id: item._id, schema: schema}
+            });
+
+            file.upload.then(function(res) {
+                console.log(res.data);
+                $timeout(function() {
+                   item.img = res.data;
+                });
+            }, function(res) {
+                if (res.status > 0) {
+                    $scope.errorMsg = res.status + ': ' + res.data;
+                }
+            }, function(evt) {
+                file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+            });
         };
 
         $scope.sortArray = function(oArr) {
@@ -173,7 +194,6 @@
             if (idx == 0) item.order = $scope.pageData.content.items.data[0].order - 1;
             else if (idx == $scope.pageData.content.items.data.length - 2) item.order = $scope.pageData.content.items.data[idx].order + 1;
             else {
-                console.log("not last");
                 var prev = $scope.pageData.content.items.data[idx - 1].order;
                 var next = $scope.pageData.content.items.data[idx + 1].order;
                 var mid = (next - prev) * 0.95;

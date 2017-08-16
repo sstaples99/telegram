@@ -208,6 +208,13 @@ input.addon {
     -ms-flex: 1;
     flex: 1
 }
+.img-addon {
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    padding: 10px;
+    min-width: 40px;
+}
 .input-group {
     display: -webkit-box;
     display: -webkit-flex;

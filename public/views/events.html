@@ -33,8 +33,10 @@
                 <input type="text" class="form-control addon" ng-model="ev.url" ng-blur="updateCard('event', ev)" placeholder="i.e. link to where event will direct"/>
             </div>
             <div class="input-group">
-                <span class="addon">Image SRC</span>
-                <input type="text" class="form-control addon" ng-model="ev.img" ng-blur="updateCard('event', ev)" placeholder="i.e. link to event's display image"/>
+                <span class="addon">Image</span>
+                <div class="img-addon" style="background-image: url('{{ev.img}}')"> </div>
+                <input type="file" ngf-select accept="image/*" ngf-max-size="2MB" ngf-model-invalid="errorFile" class="form-control addon" ng-model="ev.imgFile"/>
+                <button ng-click="uploadImg(ev, 'event')">Submit</button>
             </div>
         </div>
     </div>
