@@ -9,9 +9,7 @@ var itemSchema = new Schema({
     tags: {type: Array, default: []},
     notes: {type: Array, default: []},
     clientID: {type: String, required: true},
-    prev: {type: String, default: null},
-    next: {type: String, default: null},
-    head: {type: String}
+    order: {type: Number}
 });
 
 module.exports = mongoose.model('Item', itemSchema);

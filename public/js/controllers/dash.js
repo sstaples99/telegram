@@ -53,8 +53,8 @@
             var path = "/backendServices/dup" + p.charAt(0).toUpperCase() + p.slice(1);
             $http.post(path, item)
                 .then(function(res) {
-                   if (res.data) {
-                       $scope.pageData.content[p + "s"].data.push(res.data);
+                   if (res.data.success) {
+                       $scope.pageData.content[p + "s"].data.push(res.data.data);
                    } else {
                        swal("Error", "Unfortunately, the document could not be duplicated", "error");
                    }
@@ -65,7 +65,7 @@
             var path = "/backendServices/create" + p.charAt(0).toUpperCase() + p.slice(1);
             $http.post(path, {"clientID": $scope.pageData.active.org._id})
                 .then(function(res) {
-                    if (res.data) $scope.pageData.content[p + "s"].data.push(res.data);
+                    if (res.data.success) $scope.pageData.content[p + "s"].data.push(res.data.data);
                 });
         };
 
@@ -123,6 +123,20 @@
                 });
         };
 
+        $scope.sortArray = function(oArr) {
+            var arr = JSON.parse(JSON.stringify(oArr));
+            for (var i = 0; i < arr.length; i++) {
+                for (var j = 0; j < arr.length - i - 1; j++) {
+                    if (arr[j].order > arr[j+1].order) {
+                        var temp = arr[j];
+                        arr[j] = arr[j+1];
+                        arr[j+1] = temp;
+                    }
+                }
+            }
+            return arr;
+        };
+
         $scope.toggleService = function(s) {
             $scope.pageData.active.service = s;
         };
@@ -153,13 +167,20 @@
         $scope.dropCallback = function(idx, item) {
             var pidx = $scope.pageData.content.items.placeholder;
             if (pidx < idx) idx -= 1;
+            console.log(idx);
             if (idx == $scope.pageData.content.items.placeholder) return;
-            var prev = idx > 0 ? $scope.pageData.content.items.data[idx - 1]._id : $scope.pageData.content.items.data[idx].head;
-            var dat = {
-                _id: item._id,
-                prev: prev
-            };
-            $http.post("/backendServices/reorderItem", dat);
+
+            if (idx == 0) item.order = $scope.pageData.content.items.data[0].order - 1;
+            else if (idx == $scope.pageData.content.items.data.length - 2) item.order = $scope.pageData.content.items.data[idx].order + 1;
+            else {
+                console.log("not last");
+                var prev = $scope.pageData.content.items.data[idx - 1].order;
+                var next = $scope.pageData.content.items.data[idx + 1].order;
+                var mid = (next - prev) * 0.95;
+                item.order = prev + mid;
+            }
+            $scope.updateCard('item', item);
+            $scope.pageData.content.items.data = $scope.sortArray($scope.pageData.content.items.data);
         };
 
 

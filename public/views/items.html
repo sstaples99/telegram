@@ -3,9 +3,9 @@
     <div class="tag-nav box">
         <p><span ng-repeat="tag in pageData.content.items.uniqMenuTags" ng-class="{active: tag.active}" ng-click="toggleTag(tag)">{{tag.name}}</span></p>
     </div>
-    <ul class="container" dnd-list="pageData.content.items.data" dnd-inserted="dropCallback(index, item)">
-        <li dnd-draggable="item" dnd-dragstart="pageData.content.items.placeholder = $index" dnd-moved="pageData.content.items.data.splice($index, 1)" dnd-effect-allowed="move" dnd-selected="models.selected = item"
-            ng-class="{'selected': models.selected === item}" class="card-min box" draggable="false" ng-repeat="item in pageData.content.items.data | filter:tagShown | orderBy: order">
+    <ul class="container" style="padding: 20px 0" dnd-list="pageData.content.items.data" dnd-inserted="dropCallback(index, item)">
+        <li style="margin-bottom: 10px" dnd-draggable="item" dnd-dragstart="pageData.content.items.placeholder = $index" dnd-moved="pageData.content.items.data.splice($index, 1)" dnd-effect-allowed="move" dnd-selected="models.selected = item"
+            ng-class="{'selected': models.selected === item}" class="card-min box" draggable="false" ng-repeat="item in pageData.content.items.data | filter:tagShown | orderBy:'order'">
             <h2 ng-click="toggleCard(item._id)">{{item.title}} <span class="text-light pad-left text-small">({{item.price}})</span></h2>
             <div class="card-tools">
                 <img class="duplicate" src="/img/icons/dup.svg" ng-click="dupCard('item', item)"/>
