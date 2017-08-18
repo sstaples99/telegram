@@ -41,17 +41,45 @@ button.btn-primary {
 .tall-col {
     min-height: 100vh;
 }
-.col-1 {
+.col-1.hard {
     width: 8.3%;
     float: left;
 }
-.col-2 {
+.col-2.hard {
     width: 16.67%;
     float: left;
 }
-.col-9 {
+.col-9.hard {
     width: 75%;
     float: left;
+}
+
+.side-nav {
+    margin-left: -30%;
+    width: 30%;
+    float: left;
+    -webkit-transition: margin-left 0.5s;
+    -moz-transition: margin-left 0.5s;
+    -ms-transition: margin-left 0.5s;
+    -o-transition: margin-left 0.5s;
+    transition: margin-left 0.5s;
+}
+.pane-body {
+    width: 100%;
+    float: left;
+    -webkit-transition: width 0.5s;
+    -moz-transition: width 0.5s;
+    -ms-transition: width 0.5s;
+    -o-transition: width 0.5s;
+    transition: width 0.5s;
+}
+
+.desktop-item {
+    display: none;
+}
+
+.hide {
+    display: none;
 }
 
 .dark {
@@ -209,6 +237,7 @@ input.addon {
     flex: 1
 }
 .img-addon {
+    background-image: url("/img/icons/unknown.png");
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -293,4 +322,48 @@ span.active {
 }
 ul {
     padding: 20px 0;
+}
+
+.hamburger {
+    width: 50px;
+    height: 50px;
+    float: left;
+    padding: 0;
+    outline: none;
+    background-color: transparent !important;
+    -webkit-transition: margin-left 0.5s;
+    -moz-transition: margin-left 0.5s;
+    -ms-transition: margin-left 0.5s;
+    -o-transition: margin-left 0.5s;
+    transition: margin-left 0.5s;
+}
+.nav-active {
+    margin-left: 0;
+}
+.body-active {
+    width: 70%;
+}
+
+@media (min-width: 968px) {
+    .col-1 {
+        width: 8.3%;
+        float: left;
+        display: block;
+    }
+    .col-2 {
+        width: 16.67%;
+        float: left;
+        display: block;
+    }
+    .col-9 {
+        width: 75% !important;
+        float: left;
+        display: block;
+    }
+    .side-nav {
+        margin-left: initial;
+    }
+    .mobile-item {
+        display: none;
+    }
 }

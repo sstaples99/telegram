@@ -1,6 +1,6 @@
-<div>
+<div ng-init="pullEvents()">
     <img class="icon-small abs-tr" ng-click="createCard('event')" src="/img/icons/new.svg"/>
-    <div class="card-min box" ng-repeat="ev in pageData.content.events.data" ng-if="ev">
+    <div class="card-min box" ng-repeat="ev in pageData.content[pageData.active.org.uniqname].events.data" ng-if="ev">
         <div class="card-display">
             <h2 ng-click="toggleCard(ev._id)">{{ev.title}} <span class="text-light pad-left">{{ev.start | dateInMillis | date:'MMM d, y h:mm a'}}</span></h2>
             <div class="card-tools">
@@ -8,7 +8,6 @@
                 <label for="fav-{{ev._id}}" class="fav"></label>
                 <img class="duplicate" src="/img/icons/dup.svg" ng-click="dupCard('event', ev)"/>
                 <img class="delete" src="/img/icons/trash-1.svg" ng-click="deleteCard('event', ev, $index)"/>
-                <img class="move" src="/img/icons/move.svg"/>
             </div>
         </div>
         <div class="card-edits" id="edits-{{ev._id}}">
@@ -34,8 +33,8 @@
             </div>
             <div class="input-group">
                 <span class="addon">Image</span>
-                <div class="img-addon" style="background-image: url('{{ev.img}}')"> </div>
-                <input type="file" ngf-select accept="image/*" ngf-max-size="2MB" ngf-model-invalid="errorFile" class="form-control addon" ng-model="ev.imgFile"/>
+                <div class="img-addon" ng-class="{hide: ev.img.length == 0}" style="background-image: url('{{ev.img}}')"> </div>
+                <input type="file" ngf-select accept="image/*" ngf-max-size="1MB" ngf-model-invalid="errorFile" class="form-control addon" ng-model="ev.imgFile"/>
                 <button ng-click="uploadImg(ev, 'event')">Submit</button>
             </div>
         </div>
