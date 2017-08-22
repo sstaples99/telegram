@@ -1,11 +1,13 @@
-<div class='container'>
+<div class='container login-container'>
     <div class="col-md-4 col-md-offset-4">
-        <div class="panel small block-center top-20">
-            <img src="/img/icons/login.svg" class="circle small block-center"/><br/>
+        <div class="logo-container">
+            <div class="logo"></div>
+        </div>
+        <div class="small block-center">
             <form novalidate name='loginForm' ng-submit='login();'>
                 <div class="form-group">
-                    <input type="email" name="email" ng-model='email' ng-model-options="{ updateOn: 'default blur' }" placeholder="email" required class="form-control"/>
-                    <input type="password" name="password" ng-model='password' ng-model-options="{ updateOn: 'default blur' }" placeholder="password" required class="form-control"/>
+                    <input type="email" name="email" ng-model='email' ng-model-options="{ updateOn: 'default blur' }" placeholder="email" required class="form-control form-modern"/>
+                    <input type="password" name="password" ng-model='password' ng-model-options="{ updateOn: 'default blur' }" placeholder="password" required class="form-control form-modern"/>
                 </div>
                     <button ng-disabled="loginForm.$invalid" type="submit" class="btn btn-primary block-center">Login</button>
             </form>

@@ -18,7 +18,6 @@
                     }
                 })
         };
-
         $scope.pullEvents = function() {
             $http.post("/backendServices/getEvents", $scope.pageData.active.org)
                 .then(function(res) {
@@ -30,7 +29,17 @@
                     }
                 });
         };
-
+        $scope.getParties = function() {
+            $http.post("/backendServices/getParties", $scope.pageData.active.org)
+                .then(function(res) {
+                    if (!res.data.success) console.log("Error loading parties");
+                    else {
+                        $scope.pageData.content[$scope.pageData.active.org.uniqname].parties = {
+                            data: res.data.data
+                        };
+                    }
+                });
+        };
         $scope.pullOrgs = function() {
             $http.get("/backendServices/getOrgs")
                 .then(function(res) {
@@ -41,61 +50,10 @@
                         for (var i = 0; i < $scope.userData.orgs.length; i++) {
                             $scope.pageData.content[$scope.userData.orgs[i].uniqname] = {};
                         }
+                        $scope.pageData.active.service = $scope.pageData.active.org.services[0];
                     }
                 });
         };
-
-        $scope.updateCard = function(path, item) {
-            var path = "/backendServices/update" + path.charAt(0).toUpperCase() + path.slice(1);
-            $http.put(path, item)
-                .then(function(res) {
-                    if (!res.data.success) console.log(res.data.err);
-                });
-        };
-
-        $scope.dupCard = function(p, item) {
-            var path = "/backendServices/dup" + p.charAt(0).toUpperCase() + p.slice(1);
-            $http.post(path, item)
-                .then(function(res) {
-                   if (res.data.success) {
-                       $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
-                   } else {
-                       swal("Error", "Unfortunately, the document could not be duplicated", "error");
-                   }
-                });
-        };
-
-        $scope.createCard = function(p) {
-            var path = "/backendServices/create" + p.charAt(0).toUpperCase() + p.slice(1);
-            $http.post(path, {"clientID": $scope.pageData.active.org._id})
-                .then(function(res) {
-                    if (res.data.success) $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
-                });
-        };
-
-        $scope.deleteCard = function(p, item, idx) {
-            var path = "/backendServices/delete" + p.charAt(0).toUpperCase() + p.slice(1);
-            swal({
-                    title: "Are you sure?",
-                    text: "You will not be able to recover this document!",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes, delete it!",
-                    closeOnConfirm: false
-                }, function() {
-                    $http.post(path, item)
-                        .then(function(res) {
-                            if (!res.data) {
-                                swal("Error", "Unfortunately, the document could not be deleted", "error");
-                            } else {
-                                $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.splice(idx,1);
-                                swal("Success", "the " + p + " was deleted", "success");
-                            }
-                        });
-            });
-        };
-
         $scope.initMenus = function() {
             $http.post("/backendServices/getMenus", $scope.pageData.active.org)
                 .then(function(res) {
@@ -126,7 +84,6 @@
                     }
                 });
         };
-
         $scope.uploadImg = function(item, schema) {
             var file = item.imgFile;
             file.upload = Upload.upload({
@@ -137,7 +94,7 @@
             file.upload.then(function(res) {
                 console.log(res.data);
                 $timeout(function() {
-                   item.img = res.data;
+                    item.img = res.data;
                 });
             }, function(res) {
                 if (res.status > 0) {
@@ -148,7 +105,69 @@
             });
         };
 
-        $scope.sortArray = function(oArr) {
+        $scope.updateCard = function(p, item) {
+            var data = {
+                schema: p,
+                data: item
+            };
+            $http.put("/backendServices/updateCard", data)
+                .then(function(res) {
+                    if (!res.data.success) console.log(res.data.err);
+                });
+        };
+        $scope.dupCard = function(p, item) {
+            var data = {
+                schema: p,
+                data: item
+            };
+            $http.post("/backendServices/dupCard", data)
+                .then(function(res) {
+                   if (res.data.success) {
+                       $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
+                   } else {
+                       swal("Error", "Unfortunately, the document could not be duplicated", "error");
+                   }
+                });
+        };
+        $scope.createCard = function(p) {
+            var data = {
+                schema: p,
+                data: {
+                    clientID: $scope.pageData.active.org._id
+                }
+            }
+            $http.post("/backendServices/createCard", data)
+                .then(function(res) {
+                    if (res.data.success) $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
+                });
+        };
+        $scope.deleteCard = function(p, item, idx) {
+            var data = {
+                schema: p,
+                data: item
+            };
+            swal({
+                    title: "Are you sure?",
+                    text: "You will not be able to recover this document!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, delete it!",
+                    closeOnConfirm: false
+                }, function() {
+                    $http.post("/backendServices/deleteCard", data)
+                        .then(function(res) {
+                            if (!res.data) {
+                                swal("Error", "Unfortunately, the document could not be deleted", "error");
+                            } else {
+                                $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.splice(idx,1);
+                                swal("Success", "the " + p + " was deleted", "success");
+                            }
+                        });
+            });
+        };
+
+        var sortArray = function(oArr) {
             var arr = JSON.parse(JSON.stringify(oArr));
             for (var i = 0; i < arr.length; i++) {
                 for (var j = 0; j < arr.length - i - 1; j++) {
@@ -161,35 +180,44 @@
             }
             return arr;
         };
+        var minOrder = function(arr) {
+          var min = arr[0].order;
+          for (var i = 1; i < arr.length; i++) {
+              if (arr[i].order < min) min = arr[i].order;
+          }
+          return min;
+        };
+        var maxOrder = function(arr) {
+            var max = arr[0].order;
+            for (var i = 1; i < arr.length; i++) {
+                if (arr[i].order > max) max = arr[i].order;
+            }
+            return max;
+        };
 
         $scope.toggleService = function(s) {
             $scope.pageData.active.service = s;
         };
-
         $scope.toggleOrg = function(o) {
             $scope.pageData.active = {
                 org: o
             }
         };
-
         $scope.rotateOrg = function() {
             console.log("rotating org");
             $scope.pageData.active = {
                 org: $scope.userData.orgs[($scope.userData.orgs.indexOf($scope.pageData.active.org) + 1) % $scope.userData.orgs.length]
             }
         };
-
         $scope.toggleCard = function(id) {
             $("#edits-" + id).slideToggle();
         };
-
         $scope.toggleTag = function(tag) {
             tag.active = !tag.active;
             var idx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.findIndex(function(o) { return o === tag.name});
             if (idx < 0) $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.push(tag.name);
             else delete $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown[idx];
         };
-
         $scope.tagShown = function(tag) {
             if (tag.tags.length < 1 || (typeof tag.tags === "string")) return true;
             for (var i = 0; i < tag.tags.length; i++) {
@@ -197,23 +225,23 @@
             }
             return false;
         };
-
         $scope.dropCallback = function(idx, item) {
             var pidx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.placeholder;
             if (pidx < idx) idx -= 1;
             console.log(idx);
             if (idx == $scope.pageData.content[$scope.pageData.active.org.uniqname].items.placeholder) return;
 
-            if (idx == 0) item.order = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[0].order - 1;
-            else if (idx == $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length - 2) item.order = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[idx].order + 1;
+            if (idx == 0) item.order = minOrder($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data) - 1;
+            else if (idx == $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length - 2) item.order = maxOrder($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data) + 1;
             else {
                 var prev = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[idx - 1].order;
                 var next = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[idx + 1].order;
                 var mid = (next - prev) * 0.95;
                 item.order = prev + mid;
             }
+            console.log(item.order);
             $scope.updateCard('item', item);
-            $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data = $scope.sortArray($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data);
+            $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data = sortArray($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data);
         };
 
 
@@ -224,7 +252,6 @@
             return Date.parse(dateString);
         };
     });
-
     app.directive("dpLoad", function() {
        return {
            restrict: "A",
@@ -233,7 +260,6 @@
            }
        }
     });
-
     app.directive("clToggle", function() {
         return {
             restrict: "A",

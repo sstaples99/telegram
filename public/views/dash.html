@@ -20,6 +20,9 @@
             </span>
         </button>
         <section id="pageData.active.service">
+            <div class="service-msg" ng-if="!pageData.active.service">
+                <p>Please select a service to manage...</p>
+            </div>
             <div ng-if="pageData.active.service" ng-include="'/views/'+pageData.active.service+'.html'"></div>
         </section>
     </div>

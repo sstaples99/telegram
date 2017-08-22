@@ -8,6 +8,7 @@ module.exports = function(db, passport) {
     var clientSchema = require('../models/client');
     var eventSchema = require('../models/event');
     var itemSchema = require('../models/item');
+    var partySchema = require('../models/party');
     var flash = require('connect-flash');
     var mg = require('nodemailer-mailgun-transport');
     var multiparty = require('multiparty');
@@ -29,7 +30,7 @@ module.exports = function(db, passport) {
       return arr;
     };
 
-    var schemas = {'item': itemSchema, 'event': eventSchema};
+    var schemas = {'item': itemSchema, 'event': eventSchema, 'partie': partySchema};
 
     //Passport login methods
     var LocalStrategy = require('passport-local').Strategy;
@@ -103,44 +104,37 @@ module.exports = function(db, passport) {
            }
         });
     });
-    router.post('/dupEvent', function(req, res) {
-        var dat = JSON.parse(JSON.stringify(req.body));
-        delete dat["_id"];
-        var ev = new eventSchema(dat);
-
-        ev.save(function(err, doc) {
-          if (err) {
-              console.log("Error: (user: ", req.user.name, ") \n", err);
-              res.send({success: false, err: err});
-          } else res.send({success: true, data: doc});
-        });
-    });
-    router.post('/deleteEvent', function(req, res) {
-        eventSchema.find({_id: req.body._id}).remove(function(err, data) {
-            if (err) {
-                console.log(err);
-                res.send({success: false, err: err});
-            }
-            else res.send({success: true, data: req.body});
-        });
-    });
     router.post('/getMenus', function(req, res) {
         itemSchema.find({clientID: req.body._id},{},function(err, items) {
-           if (items) {
-               res.send({success: true, data: sortArray(items)});
-           }
-           else {
-               console.log("Error: (user: ", req.user.name, ") \n", err);
-               res.send({success: false, err: err});
-           }
+            if (items) {
+                res.send({success: true, data: sortArray(items)});
+            }
+            else {
+                console.log("Error: (user: ", req.user.name, ") \n", err);
+                res.send({success: false, err: err});
+            }
         });
     });
-    router.post('/dupItem', function(req, res) {
-        var dat = JSON.parse(JSON.stringify(req.body));
+    router.post('/getParties', function(req, res) {
+        partySchema.find({clientID: req.body._id},{},function(err, parties) {
+            console.log(err, parties);
+            if (parties) {
+                res.send({success: true, data: parties});
+            }
+            else {
+                console.log("Error: ", err);
+                res.send({success: false, err: err});
+            }
+        });
+    });
+
+    router.post('/dupCard', function(req, res) {
+        var schema = schemas[req.body.schema];
+        var dat = JSON.parse(JSON.stringify(req.body.data));
         delete dat["_id"];
 
-        itemSchema.count({clientID: req.body.clientID}, function(err, count) {
-            var item = new itemSchema(dat);
+        schema.count({clientID: req.body.data.clientID}, function(err, count) {
+            var item = new schema(dat);
             item.order = count;
             item.save(function(err, doc) {
                 if (err) {
@@ -151,26 +145,20 @@ module.exports = function(db, passport) {
         });
 
     });
-    router.post('/deleteItem', function(req, res) {
-        itemSchema.find({_id: req.body._id}).remove(function(err, data) {
+    router.post('/deleteCard', function(req, res) {
+        var schema = schemas[req.body.schema];
+        schema.find({_id: req.body.data._id}).remove(function(err, data) {
             if (err) {
                 console.log(err);
                 res.send({success: false, err: err});
             }
-            else res.send({success: true, data: req.body});
+            else res.send({success: true, data: req.body.data});
         });
     });
-    router.post('/createEvent', function(req, res) {
-        var i = new eventSchema({clientID: req.body.clientID});
-        i.save(function(err, doc) {
-            console.log(doc);
-            if (err) console.log(err);
-            else res.send({success: true, data: doc});
-        });
-    });
-    router.post('/createItem', function(req, res) {
-        itemSchema.count({clientID: req.body.clientID}, function(err, count) {
-            var item = new itemSchema({clientID: req.body.clientID});
+    router.post('/createCard', function(req, res) {
+        var schema = schemas[req.body.schema];
+        schema.count({clientID: req.body.data.clientID}, function(err, count) {
+            var item = new schema({clientID: req.body.data.clientID});
             item.order = count;
             item.save(function(err, doc) {
                 if (err) {
@@ -211,17 +199,9 @@ module.exports = function(db, passport) {
     });
 
     //PUT requests
-    router.put("/updateEvent", function(req, res) {
-       eventSchema.findOneAndUpdate({"_id": req.body._id}, req.body, {upsert: true, new: true}, function(err, doc) {
-          if (err) {
-              console.log("Error: (user: ", req.user.name, ") \n", err);
-              res.send({success: false, err: err});
-          }
-          else res.send({sucess: true, data: doc});
-       });
-    });
-    router.put("/updateItem", function(req, res) {
-        itemSchema.findOneAndUpdate({"_id": req.body._id}, req.body, {upsert: true, new: true}, function(err, doc) {
+    router.put("/updateCard", function(req, res) {
+        var schema = schemas[req.body.schema];
+        schema.findOneAndUpdate({"_id": req.body.data._id}, req.body.data, {upsert: true, new: true}, function(err, doc) {
             if (err) {
                 console.log("Error: (user: ", req.user.name, ") \n", err);
                 res.send({success: false, err: err});
