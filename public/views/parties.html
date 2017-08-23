@@ -10,37 +10,37 @@
         </div>
         <div class="card-edits" id="edits-{{party._id}}">
             <div class="input-group">
-                <span class="addon">Title</span>
+                <span class="addon addon-wide">Title</span>
                 <input type="text" class="form-control addon" ng-model="party.title" ng-blur="updateCard('partie', party)" placeholder="e.g. Miller Graduation Party"/>
             </div>
             <div class="input-group">
-                <span class="addon">Cust. Name</span>
+                <span class="addon addon-wide">Cust. Name</span>
                 <input type="text" class="form-control addon" ng-model="party.customer_name" ng-blur="updateCard('partie', party)" placeholder="e.g. John Smith"/>
             </div>
             <div class="input-group">
-                <span class="addon">Cust. Phone</span>
+                <span class="addon addon-wide">Cust. Phone</span>
                 <input type="text" class="form-control addon" ng-model="party.customer_phone" ng-blur="updateCard('partie', party)" placeholder="e.g. (847) 720-4466"/>
             </div>
             <div class="input-group">
-                <span class="addon">Cust. Email</span>
+                <span class="addon addon-wide">Cust. Email</span>
                 <input type="email" class="form-control addon" ng-model="party.customer_email" ng-blur="updateCard('partie', party)" placeholder="e.g. jsmith@gmail.com"/>
             </div>
             <p>Event Info</p>
             <div class="form-group">
                 <div class="input-group">
-                    <span class="addon">Description</span>
+                    <span class="addon addon-wide">Description</span>
                     <input type="text" class="form-control addon" ng-model="party.event_info.description" ng-blur="updateCard('partie', party)" placeholder="i.e. Graduation party from Maine South High School"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Date</span>
+                    <span class="addon addon-wide">Date</span>
                     <input dp-load type="text" class="date-time-picker form-control addon" ng-model="party.event_info.date" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Location</span>
+                    <span class="addon addon-wide">Location</span>
                     <input type="text" class="form-control addon" ng-model="party.event_info.location" ng-blur="updateCard('partie', party)" placeholder="i.e. Patio"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">No. of Guests</span>
+                    <span class="addon addon-wide">No. of Guests</span>
                     <input type="number" class="form-control form-50 addon" ng-model="party.event_info.num_guests.adults" ng-blur="updateCard('partie', party)"/>
                     <input type="number" class="form-control form-50 addon" ng-model="party.event_info.num_guests.kids" ng-blur="updateCard('partie', party)"/>
                 </div>
@@ -48,73 +48,73 @@
             <p>Drinks</p>
             <div class="form-group">
                 <div class="input-group">
-                    <span class="addon">Package Type</span>
+                    <span class="addon addon-wide">Package Type</span>
                     <input type="text" class="form-control addon" ng-model="party.drinks.package_type" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Unit Price</span>
+                    <span class="addon addon-wide">Unit Price</span>
                     <input type="text" class="form-control form-50 addon" ng-model="party.drinks.unit_price" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Payment Method</span>
+                    <span class="addon addon-wide">Payment Method</span>
                     <input type="text" class="form-control form-50 addon" ng-model="party.drinks.payment_method" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Additional Notes</span>
+                    <span class="addon addon-wide">Additional Notes</span>
                     <input type="text" class="form-control addon" ng-model="party.drinks.other" ng-blur="updateCard('partie', party)"/>
                 </div>
             </div>
             <p>Food</p>
             <div class="form-group">
                 <div class="input-group">
-                    <span class="addon">Package Type</span>
+                    <span class="addon addon-wide">Package Type</span>
                     <input type="text" class="form-control addon" ng-model="party.food.package_type" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Serving Type</span>
+                    <span class="addon addon-wide">Serving Type</span>
                     <input type="text" class="form-control addon" ng-model="party.food.serving_type" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <p>Pricing</p>
-                <div class="form-subgroup">
+                <div class="form-group">
                     <div class="input-group">
-                        <span class="addon">Tax Included</span>
+                        <span class="addon addon-wide">Tax Included</span>
                         <input type="checkbox" class="form-control form-50 addon" ng-model="party.food.price.tax_included" ng-click="updateCard('partie', party)"/>
                     </div>
                     <div class="input-group">
-                        <span class="addon">Tip Included</span>
+                        <span class="addon addon-wide">Tip Included</span>
                         <input type="checkbox" class="form-control form-50 addon" ng-model="party.food.price.tip_included" ng-click="updateCard('partie', party)"/>
                     </div>
                     <div class="input-group">
-                        <span class="addon">Unit Price</span>
+                        <span class="addon addon-wide">Unit Price</span>
                         <input type="number" class="form-control form-50 addon" ng-model="party.food.price.adult" ng-blur="updateCard('partie', party)"/>
                         <input type="number" class="form-control form-50 addon" ng-model="party.food.price.kid" ng-blur="updateCard('partie', party)"/>
                     </div>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Payment Method</span>
+                    <span class="addon addon-wide">Payment Method</span>
                     <input type="text" class="form-control addon" ng-model="party.food.payment" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Food Selections (comma separated)</span>
+                    <span class="addon addon-wide">Food Selections (comma separated)</span>
                     <input type="text" class="form-control addon array" ng-model="party.food.food_selections" ng-blur="updateCard('partie', party)"/>
                 </div>
             </div>
             <div class="input-group">
-                <span class="addon">Linens on Tables</span>
+                <span class="addon addon-wide">Linens on Tables</span>
                 <input type="checkbox" class="form-control addon" ng-model="party.linensOnTables" ng-blur="updateCard('partie', party)"/>
             </div>
             <div class="input-group">
-                <span class="addon">Special Instructions</span>
+                <span class="addon addon-wide">Special Instructions</span>
                 <input type="text" class="form-control addon" ng-model="party.special_instructions" ng-blur="updateCard('partie', party)"/>
             </div>
             <p>Admin Info</p>
             <div class="form-group">
                 <div class="input-group">
-                    <span class="addon">Deposit Amt</span>
+                    <span class="addon addon-wide">Deposit Amt</span>
                     <input type="number" class="form-control addon" ng-model="party.admin_info.deposit_amt" ng-blur="updateCard('partie', party)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Yelp</span>
+                    <span class="addon addon-wide">Yelp</span>
                     <input type="checkbox" class="form-control form-50 addon" ng-model="party.admin_info.yelp" ng-blur="updateCard('partie', party)"/>
                 </div>
             </div>

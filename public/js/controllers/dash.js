@@ -1,7 +1,7 @@
 (function() {
     var app = angular.module('telegram');
 
-    app.controller('DashController', ["$scope", "$http", "$window", "Upload", "$timeout", function($scope, $http, $window, Upload, $timeout) {
+    app.controller('DashController', ["$scope", "$http", "$window", "Upload", "$timeout", "$routeParams", "$location", function($scope, $http, $window, Upload, $timeout, $routeParams, $location) {
 
         $scope.checkStatus = function() {
             $http.get("/backendServices/isLoggedIn")
@@ -46,11 +46,23 @@
                     if (!res.data) console.log("Error finding organizations");
                     else {
                         $scope.userData.orgs = res.data;
-                        $scope.pageData.active.org = $scope.userData.orgs[0];
                         for (var i = 0; i < $scope.userData.orgs.length; i++) {
                             $scope.pageData.content[$scope.userData.orgs[i].uniqname] = {};
                         }
-                        $scope.pageData.active.service = $scope.pageData.active.org.services[0];
+                        if ($routeParams.org) {
+                            var idx = $scope.userData.orgs.findIndex(function(o) { return o.uniqname == $routeParams.org });
+                            if (idx > -1) $scope.pageData.active.org = $scope.userData.orgs[idx];
+                        } else {
+                            $scope.pageData.active.org = $scope.userData.orgs[0];
+                            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname);
+                        }
+                        if ($routeParams.service) {
+                            var idx = $scope.pageData.active.org.services.indexOf($routeParams.service);
+                            if (idx > -1) $scope.pageData.active.service = $routeParams.service;
+                        } else {
+                            $scope.pageData.active.service = $scope.pageData.active.org.services[0];
+                            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname+"/"+$scope.pageData.active.service);
+                        }
                     }
                 });
         };
@@ -63,24 +75,33 @@
                         $scope.pageData.content[$scope.pageData.active.org.uniqname].items = {
                             data: res.data.data
                         };
-                        var uniqMenuTags = [];
-                        var menuTagsShown = [];
-                        for (var i = 0; i < res.data.data.length; i++) {
-                            var item = res.data.data[i];
-                            for (var j = 0; j < item.tags.length; j++) {
-                                if (uniqMenuTags.findIndex(function(o){return o.name === item.tags[j]}) < 0) {
-                                    var tag = {
-                                        name: item.tags[j],
-                                        active: (uniqMenuTags.length == 0)
-                                    };
-                                    uniqMenuTags.push(tag);
-                                    if (tag.active) menuTagsShown.push(tag.name);
-                                }
-                            }
 
-                        }
-                        $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags = uniqMenuTags;
-                        $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown = menuTagsShown;
+                        $http.post("/backendServices/getTags", {clientID: $scope.pageData.active.org._id})
+                            .then(function(response) {
+                               if (response.data) {
+                                   var uniqMenuTags = response.data;
+                                   var menuTagsShown = [];
+                                   for (var i = 0; i < res.data.data.length; i++) {
+                                       var item = res.data.data[i];
+                                       for (var j = 0; j < item.tags.length; j++) {
+                                           if (uniqMenuTags.findIndex(function(o){return o.name === item.tags[j]}) < 0) {
+                                               var tag = {
+                                                   name: item.tags[j],
+                                                   clientID: $scope.pageData.active.org._id
+                                               };
+                                               uniqMenuTags.push(tag);
+                                               console.log(tag);
+                                               $http.post("/backendServices/createCard", {schema: 'tag', data: tag});
+                                           }
+                                       }
+
+                                   }
+                                   menuTagsShown.push(uniqMenuTags[0].name);
+                                   uniqMenuTags[0].active = true;
+                                   $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown = menuTagsShown;
+                                   $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags = uniqMenuTags;
+                               }
+                            });
                     }
                 });
         };
@@ -194,20 +215,25 @@
             }
             return max;
         };
+        var setServiceParam = function(str) {
+            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname+"/"+str);
+        };
 
         $scope.toggleService = function(s) {
             $scope.pageData.active.service = s;
+            setServiceParam(s);
         };
         $scope.toggleOrg = function(o) {
             $scope.pageData.active = {
                 org: o
-            }
+            };
+            $location.path("/dashboard/"+o.uniqname);
         };
         $scope.rotateOrg = function() {
-            console.log("rotating org");
             $scope.pageData.active = {
                 org: $scope.userData.orgs[($scope.userData.orgs.indexOf($scope.pageData.active.org) + 1) % $scope.userData.orgs.length]
-            }
+            };
+            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname);
         };
         $scope.toggleCard = function(id) {
             $("#edits-" + id).slideToggle();
@@ -224,6 +250,68 @@
                 if ($scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.findIndex(function(o) { return o === tag.tags[i]}) > -1) return true;
             }
             return false;
+        };
+        $scope.removeActiveTag = function() {
+            delete $scope.pageData.active['tag'];
+        };
+        $scope.updateTag = function() {
+            if ($scope.pageData.active.tag.placeholder === $scope.pageData.active.tag.name) return;
+            for (var i = 0; i < $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length; i++) {
+                var item = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[i];
+                var idx = item.tags.indexOf($scope.pageData.active.tag.name);
+                if (idx > -1) {
+                    item.tags[idx] = $scope.pageData.active.tag.placeholder;
+                    $http.put("/backendServices/updateCard", {schema: 'item', data: item});
+                }
+            }
+            $scope.pageData.active.tag.name = $scope.pageData.active.tag.placeholder;
+            $http.put("/backendServices/updateCard", {schema: 'tag', data: $scope.pageData.active.tag});
+        };
+        $scope.deleteTag = function() {
+            var data = {
+                schema: 'tag',
+                data: $scope.pageData.active.tag
+            };
+            console.log(data);
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to recover this document!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: false
+            }, function() {
+                $http.post("/backendServices/deleteCard", data)
+                    .then(function(res) {
+                        console.log(res);
+                        if (!res.data.data) {
+                            swal("Error", "Unfortunately, the document could not be deleted", "error");
+                        } else {
+                            console.log("yo");
+                            var idx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.findIndex(function(o) {return o.name == res.data.data.name});
+                            console.log("sup", idx);
+                            $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.splice(idx,1);
+                            console.log("pasta");
+                            swal("Success", "the tag was deleted", "success");
+                            var idx1 = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.indexOf(res.data.data.name);
+                            if (idx1 > -1) {
+                                $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.splice(idx1, 1);
+                            }
+                            console.log("check pls");
+
+
+                            for (var i = 0; i < $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length; i++) {
+                                var item = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[i];
+                                var idx = item.tags.indexOf($scope.pageData.active.tag.name);
+                                if (idx > -1) {
+                                    item.tags.splice(idx, 1);
+                                    $http.put("/backendServices/updateCard", {schema: 'item', data: item});
+                                }
+                            }
+                        }
+                    });
+            });
         };
         $scope.dropCallback = function(idx, item) {
             var pidx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.placeholder;

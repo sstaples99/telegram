@@ -1,7 +1,31 @@
 <div class="container" ng-init="initMenus()">
+
+    <div class="modal" ng-if="pageData.active.tag">
+        <div class="overlay" ng-click="removeActiveTag()"></div>
+        <div class="modal-panel">
+            <div class="header-info">
+                <h2 class="left">Tag Settings</h2>
+                <button class="btn btn-err btn-round left" style="margin-left: 10px" ng-click="deleteTag()">Delete tag</button>
+            </div>
+            <div class="input-group">
+                <span class="addon">Name (note: this changes all menu items with this tag)</span>
+                <input type="text" class="form-control addon" ng-init="pageData.active.tag.placeholder = pageData.active.tag.name" ng-model="pageData.active.tag.placeholder" ng-blur="updateTag()"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">Icon</span>
+                <div class="img-addon" ng-if="pageData.active.tag.img.length > 0" style="background-image: url('{{pageData.active.tag.img}}')"></div>
+                <input type="file" ngf-select accept="image/*" ngf-max-size="1MB" ngf-model-invalid="errorFile" class="form-control addon" ng-model="pageData.active.tag.imgFile"/>
+                <button ng-click="uploadImg(pageData.active.tag, 'tag')">Submit</button>
+            </div>
+        </div>
+    </div>
+
     <img class="icon-small abs-tr" ng-click="createCard('item')" src="/img/icons/new.svg"/>
     <div class="tag-nav box">
-        <p><span ng-repeat="tag in pageData.content[pageData.active.org.uniqname].items.uniqMenuTags" ng-class="{active: tag.active}" ng-click="toggleTag(tag)">{{tag.name}}</span></p>
+        <div class="tag-container" ng-repeat="tag in pageData.content[pageData.active.org.uniqname].items.uniqMenuTags" ng-class="{active: tag.active}">
+            <p ng-click="toggleTag(tag)">{{tag.name}}</p>
+            <img class="tag-setting" ng-click="pageData.active.tag = tag" src="/img/icons/settings.svg" ng-src="{{tag.active?'/img/icons/settings.svg':'/img/icons/settings-inactive.svg'}}"/>
+        </div>
     </div>
     <ul class="container" style="padding: 20px 0" dnd-list="pageData.content[pageData.active.org.uniqname].items.data" dnd-inserted="dropCallback(index, item)">
         <li style="margin-bottom: 10px" dnd-draggable="item" dnd-dragstart="pageData.content[pageData.active.org.uniqname].items.placeholder = $index" dnd-moved="pageData.content[pageData.active.org.uniqname].items.data.splice($index, 1)" dnd-effect-allowed="move" dnd-selected="models.selected = item"

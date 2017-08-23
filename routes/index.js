@@ -9,6 +9,7 @@ module.exports = function(db, passport) {
     var eventSchema = require('../models/event');
     var itemSchema = require('../models/item');
     var partySchema = require('../models/party');
+    var tagSchema = require('../models/tag');
     var flash = require('connect-flash');
     var mg = require('nodemailer-mailgun-transport');
     var multiparty = require('multiparty');
@@ -30,7 +31,7 @@ module.exports = function(db, passport) {
       return arr;
     };
 
-    var schemas = {'item': itemSchema, 'event': eventSchema, 'partie': partySchema};
+    var schemas = {'item': itemSchema, 'event': eventSchema, 'partie': partySchema, 'tag': tagSchema};
 
     //Passport login methods
     var LocalStrategy = require('passport-local').Strategy;
@@ -127,6 +128,15 @@ module.exports = function(db, passport) {
             }
         });
     });
+    router.post('/getTags', function(req, res) {
+        tagSchema.find({clientID: req.body.clientID}, {}, function(err, tags) {
+           if (err) {
+               res.end();
+           } else {
+               res.send(tags);
+           }
+        });
+    });
 
     router.post('/dupCard', function(req, res) {
         var schema = schemas[req.body.schema];
@@ -158,7 +168,7 @@ module.exports = function(db, passport) {
     router.post('/createCard', function(req, res) {
         var schema = schemas[req.body.schema];
         schema.count({clientID: req.body.data.clientID}, function(err, count) {
-            var item = new schema({clientID: req.body.data.clientID});
+            var item = new schema(req.body.data);
             item.order = count;
             item.save(function(err, doc) {
                 if (err) {
