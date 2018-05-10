@@ -13,6 +13,15 @@ li {
 .small {
     width: 30%;
 }
+.small-h {
+    height: 30px;
+}
+.lh-small {
+    line-height: 30px;
+}
+.br-left {
+    margin-left: 10px;
+}
 .block-center {
     display: block;
     margin: auto;
@@ -62,9 +71,10 @@ button.btn-round {
 }
 .container {
     padding: 1px;
+    margin-top: -1px;
 }
 .login-container {
-    background-image: url("/img/backgrounds/notebook.jpeg");
+    background-color: #ccc;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -85,6 +95,13 @@ button.btn-round {
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
+}
+.user-info-top {
+    overflow: auto;
+    padding: 20px;
+}
+.right {
+    float: right;
 }
 
 .tall-col {
@@ -311,7 +328,7 @@ input.form-control {
     -moz-box-sizing: border-box;
     border: 1px solid hsla(31, 15%, 50%, .25);
 }
-inpu.form-modern {
+input.form-modern {
     background-color: rgba();
 }
 
@@ -359,9 +376,9 @@ input.fav {
     cursor: pointer;
 }
 .tag-setting {
-    width: 1em;
-    height: 1em;
-    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    margin-top: 20px;
     float: left;
     background-image: url('/img/icons/settings.svg');
     -webkit-background-size: cover;
@@ -480,8 +497,148 @@ input.form-modern {
 .modal-panel span.addon {
     width: 120px;
 }
+.show-block {
+  display: block !important;
+}
+.slide-block {
+  margin-left: 0 !important;
+}
+.full-width {
+  width: 83.3%;
+}
+#ent-nav {
+  margin-left: -8.3%;
+  -webkit-transition: margin-left 0.5s;
+  -moz-transition: margin-left 0.5s;
+  -ms-transition: margin-left 0.5s;
+  -o-transition: margin-left 0.5s;
+  transition: margin-left 0.5s;
+}
+#activeOrgTitle {
+  cursor: pointer;
+}
 
-@media (min-width: 968px) {
+#init-card, #tag-settings {
+  width: 60%;
+  background-color: #eee;
+  color: #111;
+  position: absolute;
+  top: 80px;
+  right: 11.5%;
+  padding: 40px;
+  box-shadow: 0 0 10px #555;
+  border-radius: 10px;
+  display: none;
+}
+.modal-save {
+  border: none;
+  background-color: #aaa;
+  color: #fff;
+  padding: 10px;
+  width: 40%;
+  display: block;
+  margin: 10px auto;
+}
+#ev-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.4);
+  display: none;
+}
+.search-bar {
+  width: 200px !important;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+.search-group {
+  float: left;
+}
+.search-group .addon {
+  padding: 0;
+}
+.addon button {
+  border: none;
+  width: 100%;
+  height: 100%;
+  background-color: #ddd;
+  cursor: pointer;
+}
+.sort-box {
+  float: right;
+  padding-right: 20px;
+  padding-top: 5px;
+}
+.sort-box p {
+  float: left;
+  font-weight: bolder;
+  padding-right: 10px;
+  line-height: 30px;
+}
+.sort-box select {
+  height: 30px;
+}
+#top-nav-items {
+  overflow: auto;
+}
+.tag-setting-card {
+  padding: 10px;
+  margin: 10px;
+  background-color: #ddd;
+  display: block;
+  width: 80%;
+  border-radius: 5px;
+}
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('../fonts/glyphicons-halflings-regular.eot');
+  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon-ok:before {
+  content: "\e013";
+}
+.tag-setting-create input {
+  border: none;
+}
+.tag-setting-create span {
+  display: block;
+  font-size: 20px;
+  float: right;
+  cursor: pointer;
+}
+.tag-delete {
+  float: right;
+  width: 20px;
+  height: 20px;
+  background-image: url("/img/icons/trash.svg");
+  background-size: 20px;
+  cursor: pointer;
+}
+@keyframes newCardAnimation {
+    from {background-color: rgb(254,255,174);}
+    to {background-color: #eee;}
+}
+.new-card {
+  animation-name: newCardAnimation;
+  animation-duration: 2s;
+  animation-timing-function: cubic-bezier(0,1,1,1);
+}
+
+@media (min-width: 992px) {
+
     .col-1 {
         width: 8.3%;
         float: left;
@@ -494,6 +651,11 @@ input.form-modern {
     }
     .col-9 {
         width: 75% !important;
+        float: left;
+        display: block;
+    }
+    .col-10 {
+        width: 83.3% !important;
         float: left;
         display: block;
     }

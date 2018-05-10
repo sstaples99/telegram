@@ -166,6 +166,7 @@ module.exports = function(db, passport) {
         });
     });
     router.post('/createCard', function(req, res) {
+        console.log(req.body.data);
         var schema = schemas[req.body.schema];
         schema.count({clientID: req.body.data.clientID}, function(err, count) {
             var item = new schema(req.body.data);
@@ -178,17 +179,23 @@ module.exports = function(db, passport) {
             });
         });
     });
+    // router.post("/previewEvent", function(req, res) {
+    //
+    // });
     router.post('/uploadImg', function(req, res) {
        var form = new multiparty.Form();
-
        form.parse(req, function(err, fields, files) {
+         console.log(files.file[0].originalFilename);
            fs.readFile(files.file[0].path, function(err, data) {
+             console.log(files.file[0].originalFilename + "-1");
                dbx.filesUpload({ path: '/uploads/' + files.file[0].originalFilename, contents: data })
                    .then(function(dat) {
                        console.log(dat);
                        dbx.sharingCreateSharedLink({path: dat.path_lower})
                            .then(function(dat) {
+                              console.log("YOYOYOYO");
                                var url = dat.url;
+                               console.log(dat);
                                schemas[fields.schema].findOneAndUpdate({"_id": fields._id}, {img: url.replace("www.dropbox", "dl.dropboxusercontent")}, {upsert: true, new: true}, function(err, doc) {
                                    if (err) {
                                        console.log("Error: (user: ", req.user.name, ") \n", err);
@@ -198,6 +205,7 @@ module.exports = function(db, passport) {
                                });
                            })
                            .catch(function(err) {
+                              console.log("AYAYAYAYAY");
                               return res.end();
                            });
                    })

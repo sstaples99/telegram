@@ -1,24 +1,30 @@
 <div class="container" ng-init="checkStatus()">
-    <div class="col-1 desktop-item dark-grey tall-col inner-shadow" ng-init="pullOrgs()">
+    <div id="ent-nav" class="col-1 desktop-item dark-grey tall-col inner-shadow" ng-init="pullOrgs()">
         <div class="org-icon point" ng-click="toggleOrg(org)" ng-repeat="org in userData.orgs">
             <p class="up">{{org.uniqname | limitTo:1}}</p>
         </div>
     </div>
     <div class="col-2 side-nav light-grey tall-col">
         <div class="org-info">
-            <p ng-click="rotateOrg()">{{pageData.active.org.name}}</p>
+            <p id="activeOrgTitle" ng-click="toggleOrgNav()">{{pageData.active.org.name}}</p>
             <p>{{userData.user.name}}</p>
         </div>
         <div class="service-tab" ng-repeat="service in pageData.active.org.services">
             <a ng-click="toggleService(service)"><p class="box fill-width pad-med point cap">{{service}}</p></a>
         </div>
     </div>
-    <div class="col-9 pane-body white tall-col pad-med box">
+    <div class="col-10 pane-body white tall-col pad-med box">
         <button cl-toggle class="hamburger hamburger--collapse mobile-item" data-target-left=".side-nav" data-target-right=".pane-body" type="button">
             <span class="hamburger-box">
                 <span class="hamburger-inner"></span>
             </span>
         </button>
+        <!-- <div class="nav-top">
+            <div class="user-info-top">
+                <p class="lh-small br-left right point" ng-id="{{userData.user._id}}" nt-toggle>{{userData.user.name}} &#9660</p>
+                <img class="circle small-h right" ng-src="{{userData.user.img}}"/>
+            </div>
+        </div> -->
         <section id="pageData.active.service">
             <div class="service-msg" ng-if="!pageData.active.service">
                 <p>Please select a service to manage...</p>

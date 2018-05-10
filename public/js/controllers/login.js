@@ -2,7 +2,6 @@
     var app = angular.module('telegram');
 
     app.controller('LoginController', ['$scope', '$http', '$window', function($scope, $http, $window) {
-
         $scope.login = function() {
             $http.post('/backendServices/login',{
                 email: $scope.email,
@@ -20,6 +19,8 @@
         $scope.signupStatus = {
             internalServerError: false
         }
+
+        $scope.login();
 
     }]);
 

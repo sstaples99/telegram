@@ -1,45 +1,71 @@
 <div class="container" ng-init="initMenus()">
-
-    <div class="modal" ng-if="pageData.active.tag">
-        <div class="overlay" ng-click="removeActiveTag()"></div>
-        <div class="modal-panel">
-            <div class="header-info">
-                <h2 class="left">Tag Settings</h2>
-                <button class="btn btn-err btn-round left" style="margin-left: 10px" ng-click="deleteTag()">Delete tag</button>
-            </div>
-            <div class="input-group">
-                <span class="addon">Name (note: this changes all menu items with this tag)</span>
-                <input type="text" class="form-control addon" ng-init="pageData.active.tag.placeholder = pageData.active.tag.name" ng-model="pageData.active.tag.placeholder" ng-blur="updateTag()"/>
-            </div>
-            <div class="input-group">
-                <span class="addon">Icon</span>
-                <div class="img-addon" ng-if="pageData.active.tag.img.length > 0" style="background-image: url('{{pageData.active.tag.img}}')"></div>
-                <input type="file" ngf-select accept="image/*" ngf-max-size="1MB" ngf-model-invalid="errorFile" class="form-control addon" ng-model="pageData.active.tag.imgFile"/>
-                <button ng-click="uploadImg(pageData.active.tag, 'tag')">Submit</button>
-            </div>
-        </div>
+  <div id="ev-overlay" ng-click="clearOverlays()"></div>
+  <div id="tag-settings">
+    <img class="icon-small abs-tr" ng-click="newTag = true" src="/img/icons/new.svg"/>
+    <h2>Menu Sections</h2>
+    <div class="tag-setting-card tag-setting-create" style="overflow: auto" ng-if="newTag == true">
+      <input type="text" style="float: left" ng-model="newTagName" placeholder="Section title"/>
+      <span class="glyphicon glyphicon-ok" ng-click="createMenuTag(newTagName); $parent.newTag = false"></span>
     </div>
-
-    <img class="icon-small abs-tr" ng-click="createCard('item')" src="/img/icons/new.svg"/>
-    <div class="tag-nav box">
+    <div class="tag-setting-card" ng-repeat="tagSetting in pageData.content[pageData.active.org.uniqname].items.uniqMenuTags" ng-if="$index > 0">
+      <p>{{tagSetting.name}} <span class="tag-delete" ng-click="deleteTag(tagSetting)"></span></p>
+    </div>
+  </div>
+  <div id="init-card">
+    <form ng-submit="createCard('item')">
+      <div class="card-edits" style="display: block;" id="edits-init">
+          <h2 style="padding: 10px 0; color: #555">Create New Menu Item</h2>
+          <div class="card-edits" style="display: block;">
+              <div class="input-group">
+                  <span class="addon">Title</span>
+                  <input type="text" class="form-control addon" ng-model="evInit.title" placeholder="e.g. Filet Mignon"/>
+              </div>
+              <div class="input-group">
+                  <span class="addon">Description</span>
+                  <input type="text" class="form-control addon" ng-model="evInit.description" placeholder="e.g. Center cut filet in a deep mushroom sauce"/>
+              </div>
+              <div class="input-group">
+                  <span class="addon">Price</span>
+                  <input type="text" class="form-control addon" ng-model="evInit.price" placeholder="e.g. $20.00"/>
+              </div>
+              <div class="input-group">
+                  <span class="addon">Tags</span>
+                  <input type="text" class="form-control addon" ng-model="evInit.tags" placeholder="e.g. appetizers, kids menu"/>
+              </div>
+          </div>
+      </div>
+      <button type="submit" class="modal-save">Save</button>
+    </form>
+  </div>
+  <div id="top-nav-items">
+    <div class="sort-box" style="float: left; margin-top: 10px; padding-right: 10px;">
+      <p>Section: </p>
+      <select ng-change="updateItemCardFilter(itemSelectionKey)" ng-options="selectionKey.name for selectionKey in pageData.content[pageData.active.org.uniqname].items.uniqMenuTags track by selectionKey.name" ng-model="itemSelectionKey">
+        <option value="all">all</option>
+      </select>
+    </div>
+    <img class="tag-setting" ng-click="displayTagSettings()" src="/img/icons/settings.svg"/>
+    <!-- <div class="tag-nav box">
         <div class="tag-container" ng-repeat="tag in pageData.content[pageData.active.org.uniqname].items.uniqMenuTags" ng-class="{active: tag.active}">
             <p ng-click="toggleTag(tag)">{{tag.name}}</p>
             <img class="tag-setting" ng-click="pageData.active.tag = tag" src="/img/icons/settings.svg" ng-src="{{tag.active?'/img/icons/settings.svg':'/img/icons/settings-inactive.svg'}}"/>
         </div>
-    </div>
-    <ul class="container" style="padding: 20px 0" dnd-list="pageData.content[pageData.active.org.uniqname].items.data" dnd-inserted="dropCallback(index, item)">
-        <li style="margin-bottom: 10px" dnd-draggable="item" dnd-dragstart="pageData.content[pageData.active.org.uniqname].items.placeholder = $index" dnd-moved="pageData.content[pageData.active.org.uniqname].items.data.splice($index, 1)" dnd-effect-allowed="move" dnd-selected="models.selected = item"
-            ng-class="{'selected': models.selected === item}" class="card-min box" draggable="false" ng-repeat="item in pageData.content[pageData.active.org.uniqname].items.data | filter:tagShown | orderBy:'order'">
+    </div> -->
+    <img class="icon-small abs-tr" ng-click="initCreateCard('item')" src="/img/icons/new.svg"/>
+  </div>
+    <ul class="container" style="padding: 20px 0">
+        <li style="margin-bottom: 10px" ng-class="{'selected': models.selected === item, 'new-card': item.newCard}" class="card-min box"
+            ng-repeat="item in pageData.content[pageData.active.org.uniqname].items.data | filter:tagShown">
             <h2 ng-click="toggleCard(item._id)">{{item.title}} <span class="text-light pad-left text-small">({{item.price}})</span></h2>
             <div class="card-tools">
                 <img class="duplicate" src="/img/icons/dup.svg" ng-click="dupCard('item', item)"/>
                 <img class="delete" src="/img/icons/trash-1.svg" ng-click="deleteCard('item', item, $index)"/>
-                <img class="move" src="/img/icons/move.svg"/>
+                <!-- <img class="move" src="/img/icons/move.svg"/> -->
             </div>
             <div class="card-edits" id="edits-{{item._id}}" ng-init="initPickers()">
                 <div class="input-group">
                     <span class="addon">Title</span>
-                    <input type="text" class="form-control addon" ng-model="item.title" ng-blur="updateCard('item', item)" placeholder="e.g. Live Music"/>
+                    <input type="text" class="form-control addon" ng-model="item.title" ng-blur="updateCard('item', item)" placeholder="e.g. Filet Mignon"/>
                 </div>
                 <div class="input-group">
                     <span class="addon">Description</span>

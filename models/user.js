@@ -12,6 +12,7 @@ var usersSchema = new Schema({
       level: {type: String, default: 'member'},
       services: {type: Array, default: []}
     },
+    img: {type: String, default: "/img/backgrounds/user.png"},
     clientIDs: {type: Array, required: true}
   });
 

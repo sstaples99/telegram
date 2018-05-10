@@ -16,7 +16,7 @@
                                 else console.log("Error: ", res.data.err);
                             });
                     }
-                })
+                });
         };
         $scope.pullEvents = function() {
             $http.post("/backendServices/getEvents", $scope.pageData.active.org)
@@ -80,25 +80,27 @@
                             .then(function(response) {
                                if (response.data) {
                                    var uniqMenuTags = response.data;
-                                   var menuTagsShown = [];
-                                   for (var i = 0; i < res.data.data.length; i++) {
-                                       var item = res.data.data[i];
-                                       for (var j = 0; j < item.tags.length; j++) {
-                                           if (uniqMenuTags.findIndex(function(o){return o.name === item.tags[j]}) < 0) {
-                                               var tag = {
-                                                   name: item.tags[j],
-                                                   clientID: $scope.pageData.active.org._id
-                                               };
-                                               uniqMenuTags.push(tag);
-                                               console.log(tag);
-                                               $http.post("/backendServices/createCard", {schema: 'tag', data: tag});
-                                           }
-                                       }
-
-                                   }
-                                   menuTagsShown.push(uniqMenuTags[0].name);
+                                   // var menuTagsShown = [];
+                                   // for (var i = 0; i < res.data.data.length; i++) {
+                                   //     var item = res.data.data[i];
+                                   //     for (var j = 0; j < item.tags.length; j++) {
+                                   //         if (uniqMenuTags.findIndex(function(o){return o.name === item.tags[j]}) < 0) {
+                                   //             var tag = {
+                                   //                 name: item.tags[j],
+                                   //                 clientID: $scope.pageData.active.org._id
+                                   //             };
+                                   //             uniqMenuTags.push(tag);
+                                   //             $http.post("/backendServices/createCard", {schema: 'tag', data: tag});
+                                   //         }
+                                   //     }
+                                   //
+                                   // }
+                                   // menuTagsShown.push(uniqMenuTags[0].name);
                                    uniqMenuTags[0].active = true;
-                                   $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown = menuTagsShown;
+                                   uniqMenuTags.unshift({
+                                     name: "all"
+                                   });
+                                   // $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown = menuTagsShown;
                                    $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags = uniqMenuTags;
                                }
                             });
@@ -113,7 +115,6 @@
             });
 
             file.upload.then(function(res) {
-                console.log(res.data);
                 $timeout(function() {
                     item.img = res.data;
                 });
@@ -127,10 +128,14 @@
         };
 
         $scope.updateCard = function(p, item) {
+            if (typeof item.tags == "string") {
+              item.tags = item.tags.split(",");
+            }
             var data = {
                 schema: p,
                 data: item
             };
+            console.log(item);
             $http.put("/backendServices/updateCard", data)
                 .then(function(res) {
                     if (!res.data.success) console.log(res.data.err);
@@ -144,25 +149,41 @@
             $http.post("/backendServices/dupCard", data)
                 .then(function(res) {
                    if (res.data.success) {
-                       $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
+                       res.data.data.newCard = true;
+                       $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.unshift(res.data.data);
                    } else {
                        swal("Error", "Unfortunately, the document could not be duplicated", "error");
                    }
                 });
         };
+        $scope.initCreateCard = function(p) {
+          $scope.evInit = {
+            img: "/img/icons/unknown.png"
+          }
+          $("#ev-overlay").addClass("show-block");
+          $("#init-card").addClass("show-block");
+        }
+        $scope.clearOverlays = function() {
+          $("#ev-overlay").removeClass("show-block");
+          $("#init-card").removeClass("show-block");
+          $("#tag-settings").removeClass("show-block");
+        }
         $scope.createCard = function(p) {
             var data = {
                 schema: p,
-                data: {
-                    clientID: $scope.pageData.active.org._id
-                }
+                data: $scope.evInit
             }
+            data.data.clientID = $scope.pageData.active.org._id;
             $http.post("/backendServices/createCard", data)
                 .then(function(res) {
-                    if (res.data.success) $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
+                    if (res.data.success) {
+                      $scope.clearOverlays();
+                      $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
+                      $("#evbox-" + res.data.data._id).addClass("new-card");
+                    }
                 });
         };
-        $scope.deleteCard = function(p, item, idx) {
+        $scope.deleteCard = function(p, item) {
             var data = {
                 schema: p,
                 data: item
@@ -181,6 +202,13 @@
                             if (!res.data) {
                                 swal("Error", "Unfortunately, the document could not be deleted", "error");
                             } else {
+                                var idx = -1;
+                                for (var i = 0; i < $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.length; ++i) {
+                                  if ($scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data[i]._id == item._id) {
+                                    idx = i;
+                                    break;
+                                  }
+                                }
                                 $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.splice(idx,1);
                                 swal("Success", "the " + p + " was deleted", "success");
                             }
@@ -220,8 +248,8 @@
         };
 
         $scope.toggleService = function(s) {
-            $scope.pageData.active.service = s;
             setServiceParam(s);
+            $scope.pageData.active.service = s;
         };
         $scope.toggleOrg = function(o) {
             $scope.pageData.active = {
@@ -229,6 +257,10 @@
             };
             $location.path("/dashboard/"+o.uniqname);
         };
+        $scope.toggleOrgNav = function() {
+          $("#ent-nav").toggleClass("slide-block");
+          $(".pane-body").toggleClass("col-10").toggleClass("col-9");
+        }
         $scope.rotateOrg = function() {
             $scope.pageData.active = {
                 org: $scope.userData.orgs[($scope.userData.orgs.indexOf($scope.pageData.active.org) + 1) % $scope.userData.orgs.length]
@@ -245,9 +277,9 @@
             else delete $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown[idx];
         };
         $scope.tagShown = function(tag) {
-            if (tag.tags.length < 1 || (typeof tag.tags === "string")) return true;
+            if ($scope.itemSelectionKey.name == "all") return true;
             for (var i = 0; i < tag.tags.length; i++) {
-                if ($scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.findIndex(function(o) { return o === tag.tags[i]}) > -1) return true;
+                if (tag.tags[i] == $scope.itemSelectionKey.name) return true;
             }
             return false;
         };
@@ -267,12 +299,11 @@
             $scope.pageData.active.tag.name = $scope.pageData.active.tag.placeholder;
             $http.put("/backendServices/updateCard", {schema: 'tag', data: $scope.pageData.active.tag});
         };
-        $scope.deleteTag = function() {
+        $scope.deleteTag = function(tag) {
             var data = {
                 schema: 'tag',
-                data: $scope.pageData.active.tag
+                data: tag
             };
-            console.log(data);
             swal({
                 title: "Are you sure?",
                 text: "You will not be able to recover this document!",
@@ -288,18 +319,9 @@
                         if (!res.data.data) {
                             swal("Error", "Unfortunately, the document could not be deleted", "error");
                         } else {
-                            console.log("yo");
                             var idx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.findIndex(function(o) {return o.name == res.data.data.name});
-                            console.log("sup", idx);
                             $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.splice(idx,1);
-                            console.log("pasta");
                             swal("Success", "the tag was deleted", "success");
-                            var idx1 = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.indexOf(res.data.data.name);
-                            if (idx1 > -1) {
-                                $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.splice(idx1, 1);
-                            }
-                            console.log("check pls");
-
 
                             for (var i = 0; i < $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length; i++) {
                                 var item = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[i];
@@ -332,6 +354,70 @@
             $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data = sortArray($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data);
         };
 
+        $scope.updateCardFilter = function(key) {
+          $scope.eventOrdering = $scope.possibleEventOrderings[key];
+        }
+        $scope.updateItemCardFilter = function(key) {
+          $scope.itemSelectionKey.name = key.name;
+        }
+
+        $scope.possibleEventOrderings = {
+          "dateN": {
+            field: "start",
+            reverse: true
+          },
+          "dateO": {
+            field: "start",
+            reverse: false
+          },
+          "featured": {
+            field: "featured",
+            reverse: true
+          },
+          "title":{
+              field: "title",
+              reverse: false
+          }
+        }
+        $scope.eventOrderKey = "dateN";
+        $scope.eventOrdering = $scope.possibleEventOrderings["dateN"];
+
+        $scope.itemSelectionKey = {
+          name: "all"
+        };
+
+        $scope.displayTagSettings = function() {
+          $("#tag-settings").addClass("show-block");
+          $("#ev-overlay").addClass("show-block");
+        }
+
+        $scope.createMenuTag = function(tag) {
+          if (!tag) return;
+          var tag = {
+            name: tag,
+            clientID: $scope.pageData.active.org._id
+          };
+          var postData = {
+            schema: "tag",
+            data: tag
+          };
+
+          $.post("/backendServices/createCard", postData)
+            .then(function(res) {
+                if (res.success) {
+                  $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.splice(1,0,res.data);
+                  $scope.$apply();
+                } else {
+                  console.log("ay");
+                }
+            });
+        }
+
+        $scope.previewEvent = function(ev) {
+
+        }
+
+
 
     }]);
 
@@ -356,6 +442,22 @@
                    $(this).toggleClass("is-active");
                    $($(this).attr("data-target-left")).toggleClass("nav-active");
                    $($(this).attr("data-target-right")).toggleClass("body-active");
+                });
+            }
+        }
+    });
+    app.directive("ntToggle", function() {
+        return {
+            restrict: "A",
+            link: function(scope, el, attrs) {
+                $(el).click(function() {
+                    var drop = new Drop({
+                        target: $("#test"),
+                        content: 'Welcome to the future!',
+                        position: 'bottom left',
+                        openOn: 'click'
+                    });
+                    alert("wassup 1");
                 });
             }
         }

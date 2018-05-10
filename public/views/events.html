@@ -1,13 +1,61 @@
 <div ng-init="pullEvents()">
-    <img class="icon-small abs-tr" ng-click="createCard('event')" src="/img/icons/new.svg"/>
-    <div class="card-min box" ng-repeat="ev in pageData.content[pageData.active.org.uniqname].events.data" ng-if="ev">
+    <div id="ev-overlay" ng-click="clearOverlays()"></div>
+    <div id="init-card">
+      <form ng-submit="createCard('event')">
+        <div class="card-edits" style="display: block;" id="edits-init">
+            <h2 style="padding: 10px 0; color: #555">Create New Event</h2>
+            <div class="input-group">
+                <span class="addon">Title</span>
+                <input type="text" class="form-control addon" ng-model="evInit.title" placeholder="e.g. Live Music"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">Start</span>
+                <input dp-load type="text" class="date-time-picker form-control form-50 addon" ng-model="evInit.start"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">End</span>
+                <input dp-load type="text" class="date-time-picker form-control form-50 addon" ng-model="evInit.end"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">Description</span>
+                <input type="text" class="form-control addon" ng-model="evInit.description" placeholder="e.g. Classic/alt rock music"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">URL</span>
+                <input type="text" class="form-control addon" ng-model="evInit.url" placeholder="i.e. link to where event will direct"/>
+            </div>
+            <div class="input-group">
+                <span class="addon">Image</span>
+                <div class="img-addon" ng-class="{hide: ev.img.length == 0}" style="background-image: url('{{evInit.img}}')"> </div>
+                <input type="file" ngf-select accept="image/*" ngf-max-size="1MB" ngf-model-invalid="errorFile" class="form-control addon" ng-model="evInit.imgFile"/>
+                <button type="button" ng-click="uploadImg(evInit, 'event')">Submit</button>
+            </div>
+        </div>
+        <button type="submit" class="modal-save">Save</button>
+      </form>
+    </div>
+    <div class="input-group search-group">
+        <input type="text" class="search-bar" ng-model="eventSearch" placeholder="Search"/>
+    </div>
+    <img class="icon-small abs-tr" ng-click="initCreateCard('event')" src="/img/icons/new.svg"/>
+    <div class="sort-box">
+      <p>Sort: </p>
+      <select ng-change="updateCardFilter(eventOrderKey)" ng-model="eventOrderKey">
+        <option value="dateN">Date (newest first)</option>
+        <option value="dateO">Date (oldest first)</option>
+        <option value="title">Title</option>
+        <option value="featured">Featured First</option>
+      </select>
+    </div>
+    <div ng-class="{'new-card': ev.newCard}" class="card-min box" ng-repeat="ev in pageData.content[pageData.active.org.uniqname].events.data | orderBy:eventOrdering.field:eventOrdering.reverse | filter:eventSearch" ng-if="ev">
         <div class="card-display">
             <h2 ng-click="toggleCard(ev._id)">{{ev.title}} <span class="text-light pad-left">{{ev.start | dateInMillis | date:'MMM d, y h:mm a'}}</span></h2>
             <div class="card-tools">
                 <input id="fav-{{ev._id}}" class="fav" type="checkbox" ng-model="ev.featured" ng-click="updateCard('event', ev)"/>
                 <label for="fav-{{ev._id}}" class="fav"></label>
                 <img class="duplicate" src="/img/icons/dup.svg" ng-click="dupCard('event', ev)"/>
-                <img class="delete" src="/img/icons/trash-1.svg" ng-click="deleteCard('event', ev, $index)"/>
+                <!-- <img class="preview" src="/img/icons/preview.svg" ng-click="previewEvent(ev)"/> -->
+                <img class="delete" src="/img/icons/trash-1.svg" ng-click="deleteCard('event', ev)"/>
             </div>
         </div>
         <div class="card-edits" id="edits-{{ev._id}}">
