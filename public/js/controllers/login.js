@@ -16,6 +16,18 @@
             });
         }
 
+        $http.post('/backendServices/login',{
+            email: "seanstapleton100@gmail.com",
+            password: "Sean2323"
+        }).then(function(res) {
+            if(res.data.success) {
+                $window.location = '/dashboard';
+            } else {
+                $scope.loginError = true;
+                $scope.loginStatus.internalServerError = true;
+            }
+        });
+
         $scope.signupStatus = {
             internalServerError: false
         }

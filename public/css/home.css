@@ -610,13 +610,30 @@ input.form-modern {
 .glyphicon-ok:before {
   content: "\e013";
 }
+.glyphicon-remove-circle:before {
+  content: "\e088";
+}
+.tag-setting-create {
+  position: relative;
+}
 .tag-setting-create input {
   border: none;
+  display: block;
+  margin-bottom: 5px;
+}
+.truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
 }
 .tag-setting-create span {
   display: block;
   font-size: 20px;
-  float: right;
+  position: absolute;
+  top: 10px;
+  right: 10px;
   cursor: pointer;
 }
 .tag-delete {
@@ -626,6 +643,22 @@ input.form-modern {
   background-image: url("/img/icons/trash.svg");
   background-size: 20px;
   cursor: pointer;
+}
+.tag-add {
+  float: right;
+  width: 20px;
+  height: 20px;
+  background-image: url("/img/icons/new.svg");
+  background-size: 20px;
+  cursor: pointer;
+}
+.tag-glyph {
+  float: right;
+  font-size: 15px;
+  cursor: pointer;
+}
+.tag-submenu {
+  padding-left: 20px;
 }
 @keyframes newCardAnimation {
     from {background-color: rgb(254,255,174);}

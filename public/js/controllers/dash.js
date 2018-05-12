@@ -391,10 +391,12 @@
           $("#ev-overlay").addClass("show-block");
         }
 
-        $scope.createMenuTag = function(tag) {
+        $scope.createMenuTag = function(tag, header) {
           if (!tag) return;
           var tag = {
             name: tag,
+            id: tag.replace(/\W/g, ''),
+            header_img: header || "http://www.caseysnewbuffalo.com/img/backgrounds/brunch.jpg",
             clientID: $scope.pageData.active.org._id
           };
           var postData = {
@@ -413,8 +415,45 @@
             });
         }
 
-        $scope.previewEvent = function(ev) {
+        $scope.createTagSubmenu = function(submenuTxt, tagID) {
+          $.post("/backendServices/addSubmenu", {menuID: tagID, submenuText: submenuTxt})
+            .then(function(res) {
+              if (res.success) {
+                var idx = 0;
+                var uniqTags = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags;
+                for (var i = 0; i < uniqTags.length; ++i) {
+                  if (uniqTags[i]._id == tagID)
+                    idx = i;
+                }
+                $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags[idx].submenus.push(submenuTxt);
+                $scope.$apply();
+              } else {
+                console.log(res.err);
+              }
+            });
+        }
 
+        $scope.removeSubmenu = function(submenuTxt, tagID) {
+          $.post("/backendServices/removeSubmenu", {menuID: tagID, submenuText: submenuTxt})
+            .then(function(res) {
+              if (res.success) {
+                var idx = 0;
+                var uniqTags = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags;
+                for (var i = 0; i < uniqTags.length; ++i) {
+                  if (uniqTags[i]._id == tagID)
+                    idx = i;
+                }
+                var submenuIdx = 0;
+                for (var i = 0; i < uniqTags[idx].submenus.length; ++i) {
+                  if (uniqTags[idx].submenus[i] == submenuTxt)
+                    submenuIdx = i;
+                }
+                $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags[idx].submenus.splice(submenuIdx, 1);
+                $scope.$apply();
+              } else {
+                console.log(res.err);
+              }
+            });
         }
 
 

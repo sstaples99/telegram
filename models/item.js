@@ -8,6 +8,7 @@ var itemSchema = new Schema({
     price: {type: String, default: ""},
     tags: {type: Array, default: []},
     notes: {type: Array, default: []},
+    subsection: {type: String},
     clientID: {type: String, required: true},
     order: {type: Number}
 });

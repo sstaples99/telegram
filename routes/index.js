@@ -72,6 +72,39 @@ module.exports = function(db, passport) {
         req.logout();
         res.end();
     });
+    router.post("/addSubmenu", function(req, res) {
+      tagSchema.findOneAndUpdate({_id: req.body.menuID},{ $push: {submenus: req.body.submenuText}}, function(err, menus) {
+        if (err) {
+          console.log("ERROR: ", err);
+          res.send({success: false, err: err});
+        } else {
+          res.send({success: true});
+        }
+      });
+    });
+    router.post("/removeSubmenu", function(req, res) {
+      tagSchema.findById(req.body.menuID, function(err, menu) {
+        if (err) {
+          console.log("ERROR: ", err);
+          res.send({success: false, err: err});
+        } else {
+          var idx = 0;
+          for (var i = 0; i < menu.submenus.length; ++i) {
+            if (menu.submenus[i] == req.body.submenuText)
+              idx = i;
+          }
+          menu.submenus.splice(idx, 1);
+          menu.save(function(err, menu) {
+            if (err) {
+              console.log(err);
+              res.send({success: false, err: err});
+            } else {
+              res.send({success: true});
+            }
+          });
+        }
+      });
+    });
 
 
     //GET requests
@@ -185,17 +218,12 @@ module.exports = function(db, passport) {
     router.post('/uploadImg', function(req, res) {
        var form = new multiparty.Form();
        form.parse(req, function(err, fields, files) {
-         console.log(files.file[0].originalFilename);
            fs.readFile(files.file[0].path, function(err, data) {
-             console.log(files.file[0].originalFilename + "-1");
                dbx.filesUpload({ path: '/uploads/' + files.file[0].originalFilename, contents: data })
                    .then(function(dat) {
-                       console.log(dat);
                        dbx.sharingCreateSharedLink({path: dat.path_lower})
                            .then(function(dat) {
-                              console.log("YOYOYOYO");
                                var url = dat.url;
-                               console.log(dat);
                                schemas[fields.schema].findOneAndUpdate({"_id": fields._id}, {img: url.replace("www.dropbox", "dl.dropboxusercontent")}, {upsert: true, new: true}, function(err, doc) {
                                    if (err) {
                                        console.log("Error: (user: ", req.user.name, ") \n", err);
@@ -205,7 +233,6 @@ module.exports = function(db, passport) {
                                });
                            })
                            .catch(function(err) {
-                              console.log("AYAYAYAYAY");
                               return res.end();
                            });
                    })

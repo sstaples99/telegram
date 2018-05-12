@@ -4,11 +4,15 @@
     <img class="icon-small abs-tr" ng-click="newTag = true" src="/img/icons/new.svg"/>
     <h2>Menu Sections</h2>
     <div class="tag-setting-card tag-setting-create" style="overflow: auto" ng-if="newTag == true">
-      <input type="text" style="float: left" ng-model="newTagName" placeholder="Section title"/>
-      <span class="glyphicon glyphicon-ok" ng-click="createMenuTag(newTagName); $parent.newTag = false"></span>
+      <span class="glyphicon glyphicon-ok" ng-click="createMenuTag(newTagName, newTagHeader); $parent.newTag = false"></span>
+      <input type="text" ng-model="newTagName" placeholder="Section title"/>
+      <input type="text" ng-model="newTagHeader" placeholder="Header Image (url)"/>
     </div>
     <div class="tag-setting-card" ng-repeat="tagSetting in pageData.content[pageData.active.org.uniqname].items.uniqMenuTags" ng-if="$index > 0">
-      <p>{{tagSetting.name}} <span class="tag-delete" ng-click="deleteTag(tagSetting)"></span></p>
+      <p style="margin-bottom: 10px;">{{tagSetting.name}} <span class="tag-add" ng-click="tagSetting.initSubmenu = true"></span><span class="tag-delete" ng-click="deleteTag(tagSetting)"></span></p>
+      <p style="padding-left: 10px;"><span style="font-weight: bolder;">Header Image: </span><a href="tagSetting.header_img" style="text-decoration: none; line-height: 1.1em;" class="truncate">{{tagSetting.header_img}}</a></p>
+      <p class="tag-submenu" ng-if="tagSetting.initSubmenu == true">+<input type="text" ng-model="tagSetting.initSubmenuText"/> <span class="glyphicon glyphicon-ok" ng-click="createTagSubmenu(tagSetting.initSubmenuText, tagSetting._id); $parent.tagSetting.initSubmenu = false"></span></p>
+      <p class="tag-submenu" ng-repeat="submenu in tagSetting.submenus">+{{submenu}} <span class="tag-glyph glyphicon glyphicon-remove-circle" ng-click="removeSubmenu(submenu, tagSetting._id)"></span></p>
     </div>
   </div>
   <div id="init-card">
@@ -29,8 +33,12 @@
                   <input type="text" class="form-control addon" ng-model="evInit.price" placeholder="e.g. $20.00"/>
               </div>
               <div class="input-group">
-                  <span class="addon">Tags</span>
-                  <input type="text" class="form-control addon" ng-model="evInit.tags" placeholder="e.g. appetizers, kids menu"/>
+                  <span class="addon">Main Sections</span>
+                  <input type="text" class="form-control addon" ng-model="evInit.tags" placeholder="e.g. Lunch, Dinner, etc."/>
+              </div>
+              <div class="input-group">
+                  <span class="addon">Subsection</span>
+                  <input type="text" class="form-control addon" ng-model="evInit.subsection" placeholder="e.g. appetizers, kids menu, etc."/>
               </div>
           </div>
       </div>
@@ -76,8 +84,12 @@
                     <input type="text" class="form-control addon" ng-model="item.price" ng-blur="updateCard('item', item)"/>
                 </div>
                 <div class="input-group">
-                    <span class="addon">Tags</span>
-                    <input type="text" class="form-control addon" ng-model="item.tags" ng-blur="updateCard('item', item)" placeholder="e.g. appetizers, kids menu"/>
+                    <span class="addon">Main Sections</span>
+                    <input type="text" class="form-control addon" ng-model="item.tags" ng-blur="updateCard('item', item)" placeholder="e.g. Lunch, Dinner, etc."/>
+                </div>
+                <div class="input-group">
+                    <span class="addon">Subsection</span>
+                    <input type="text" class="form-control addon" ng-model="item.subsection" ng-blur="updateCard('item', item)" placeholder="e.g. appetizers, kids menu"/>
                 </div>
             </div>
         </li>
