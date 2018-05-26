@@ -278,6 +278,9 @@
         };
         $scope.tagShown = function(tag) {
             if ($scope.itemSelectionKey.name == "all") return true;
+            if (typeof tag.tags == "string") {
+              tag.tags = tag.tags.split(",");
+            }
             for (var i = 0; i < tag.tags.length; i++) {
                 if (tag.tags[i] == $scope.itemSelectionKey.name) return true;
             }

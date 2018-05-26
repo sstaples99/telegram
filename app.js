@@ -1,5 +1,4 @@
 module.exports = function(db) {
-
   //load modules
   var express       = require('express');
   //var multer        = require('multer');
@@ -16,7 +15,6 @@ module.exports = function(db) {
 
   //load routes
   var routes = require('./routes/index');
-
   var app = express();
 
     // view engine setup
