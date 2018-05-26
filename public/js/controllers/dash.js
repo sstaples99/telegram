@@ -169,6 +169,9 @@
           $("#tag-settings").removeClass("show-block");
         }
         $scope.createCard = function(p) {
+            if ($scope.evInit.tags && typeof $scope.evInit.tags == "string") {
+              $scope.evInit.tags = $scope.evInit.tags.split(",");
+            }
             var data = {
                 schema: p,
                 data: $scope.evInit
