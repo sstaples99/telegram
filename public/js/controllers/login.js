@@ -1,27 +1,34 @@
-(function() {
-    var app = angular.module('telegram');
+const angular = require('angular');
+const _ = require('lodash');
 
-    app.controller('LoginController', ['$scope', '$http', '$window', function($scope, $http, $window) {
-        $scope.login = function() {
-            $http.post('/backendServices/login',{
-                email: $scope.email,
-                password: $scope.password
-            }).then(function(res) {
-                if(res.data.success) {
-                    $window.location = '/dashboard';
-                } else {
-                    $scope.loginError = true;
-                    $scope.loginStatus.internalServerError = true;
-                }
-            });
-        }
+((() => {
+  const app = angular.module('telegram');
 
-        $scope.signupStatus = {
-            internalServerError: false
-        }
+  app.controller(
+    'LoginController',
+    ['$scope', '$http', '$window', function ($scope, $http, $window) { // eslint-disable-line func-names
+      const $windowRef = $window;
+      $scope.login = () => {
+        console.log('ay');
+        $http.post('/backendServices/user/login', {
+          email: $scope.email,
+          password: $scope.password,
+        }).then((res) => {
+          console.log('yo', res);
+          if (res.data.success) {
+            $windowRef.location = '/dashboard';
+          } else {
+            $scope.loginError = true;
+            _.set($scope, 'loginStatus.internalServerError', true);
+          }
+        });
+      };
 
-        $scope.login();
+      $scope.signupStatus = {
+        internalServerError: false,
+      };
 
-    }]);
-
-}());
+      $scope.login();
+    }],
+  );
+})());

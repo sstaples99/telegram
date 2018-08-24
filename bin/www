@@ -1,64 +1,63 @@
 #!/usr/bin/env node
 
-//load modules
-var debug = require('debug')('telegram:server');
-var http = require('http');
-var db    = require('../db');
+const debug = require('debug')('telegram:server');
+const http = require('http');
+const db = require('../db');
 
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    console.log('Mongo Database Connected');
+db.once('open', () => {
+  console.log('Mongo Database Connected');
 });
 
-var app = require('../app')(db);
+const app = require('../app')(db);
 
-
-//Get port from env and store in Express
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
-
-//create server and listen on port
-var server = http.createServer(app);
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-
-//normalize port into a number, string, or false
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-  if (isNaN(port)) return val;
+// normalize port into a number, string, or false
+const normalizePort = (val) => {
+  const port = parseInt(val, 10);
+  if (isNaN(port)) return val; // eslint-disable-line no-restricted-globals
   if (port >= 0) return port;
   return false;
-}
+};
 
-//event listener for error event
-function onError(error) {
+// Get port from env and store in Express
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+// event listener for error event
+const onError = (error) => {
   if (error.syscall !== 'listen') throw error;
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  const bind = typeof port === 'string'
+    ? `Pipe ${port}`
+    : `Port ${port}`;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      console.error(`${bind} requires elevated privileges`);
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      console.error(`${bind} is already in use`);
       process.exit(1);
       break;
     default:
       throw error;
   }
-}
+};
 
-//event listener for listening event
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
+// create server and listen on port
+const server = http.createServer(app);
+server.listen(port);
+server.on('error', onError);
+
+// event listener for listening event
+const onListening = () => {
+  const addr = server.address();
+  const bind = typeof addr === 'string'
+    ? `pipe ${addr}`
+    : `port ${addr.port}`;
+  debug(`Listening on ${bind}`);
+};
+
+server.on('listening', onListening);

@@ -16,9 +16,6 @@
         <link rel="stylesheet" href="/lib/hamburgers.min.css"/>
         <link rel="stylesheet" href="/lib/drop/dist/css/drop-theme-arrows.css" />
         <link rel="stylesheet" href="/css/home.css">
-        <!-- Scripts -->
-        <script type='text/javascript' src='/lib/jquery/jquery.min.js'></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     </head>
     <body ng-app="telegram" class="dark-grey" ng-controller="HomeController">
 
@@ -29,61 +26,10 @@
     </body>
 </html>
 <!-- load library scripts -->
-<script type="text/javascript" src="/lib/datetime/datetime.min.js"></script>
-<script type="text/javascript" src="/lib/sweetalert/sweetalert.min.js"></script>
+<!-- <script type="text/javascript" src="/lib/datetime/datetime.min.js"></script> -->
 <script type="text/javascript" src="/lib/tether/dist/js/tether.min.js"></script>
-<script type="text/javascript" src="/lib/drop/dist/js/drop.min.js"></script>
-<script src='/lib/angular/angular.min.js'></script>
-<script src='/lib/angular/angular-route.min.js'></script>
-<script src='/lib/angular/angular-messages.min.js'></script>
-<script type="text/javascript" src="/lib/DragDrop/angular-drag-and-drop-lists.min.js"></script>
-<script type="text/javascript" src="/lib/ng-file-upload/ng-file-upload-shim.min.js"></script>
-<script type="text/javascript" src="/lib/ng-file-upload/ng-file-upload.min.js"></script>
+<!-- <script type="text/javascript" src="/lib/DragDrop/angular-drag-and-drop-lists.min.js"></script> -->
+<!-- <script type="text/javascript" src="/lib/ng-file-upload/ng-file-upload-shim.min.js"></script> -->
+<!-- <script type="text/javascript" src="/lib/ng-file-upload/ng-file-upload.min.js"></script> -->
 <!-- angular initialization -->
-<script type='text/javascript'>
-    (function() {
-        var app = angular.module('telegram', ['ngRoute', 'dndLists', 'ngFileUpload']);
-        app.config(['$routeProvider','$locationProvider', function($routeProvider, $locationProvider){
-            $routeProvider
-                .when('/', {
-                    templateUrl: '/views/login.html',
-                    controller: 'LoginController'
-                })
-                 .when('/dashboard/:org?/:service?', {
-                     templateUrl: '/views/dash.html',
-                     controller: 'DashController'
-                 })
-                // .when('/menus', {
-                //   templateUrl: '/views/menus.html',
-                //   controller: 'DashController'
-                // })
-                // .when('/photos', {
-                //     templateUrl: '/views/photos.html',
-                //     controller: 'DashController'
-                // })
-                // .when('/parties', {
-                //     templateUrl: '/views/parties.html',
-                //     controller: 'DashController'
-                // })
-                // .when('/logs', {
-                //   templateUrl: '/views/logs.html',
-                //   controller: 'DashController'
-                // })
-                .otherwise({
-                  redirectTo: '/'
-                });
-                $locationProvider.html5Mode(true);
-        }]);
-
-        app.filter('iif', function () {
-           return function(input, trueValue, falseValue) {
-                return input ? trueValue : falseValue;
-           };
-        });
-    }());
-
-</script>
-<!-- load angular controllers -->
-<script type="text/javascript" src="/js/controllers/login.js"></script>
-<script type="text/javascript" src="/js/controllers/home.js"></script>
-<script type="text/javascript" src="/js/controllers/dash.js"></script>
+<script type="text/javascript" src="/js/dist/index-bundle.js"></script>

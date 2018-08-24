@@ -1,25 +1,30 @@
-(function() {
-  var app = angular.module('telegram');
+const angular = require('angular');
 
-  app.controller('HomeController', ['$scope', '$http', '$window', function($scope, $http, $window) {
+((() => {
+  const app = angular.module('telegram');
 
-    $scope.userData = {
-      isLoggedIn: false
-    };
+  app.controller(
+    'HomeController',
+    ['$scope',
+      '$http',
+      '$window',
+      function ($scope, $http, $window) { // eslint-disable-line func-names
+        const $windowRef = $window;
+        $scope.userData = {
+          isLoggedIn: false,
+        };
 
-    $scope.pageData = {
-      active: {},
-      content: {}
-    };
+        $scope.pageData = {
+          active: {},
+          content: {},
+        };
 
-    $scope.logout = function() {
-      $http.get('/backendServices/logout')
-        .then(function(res) {
-          $window.location = "/";
-        });
-    }
-
-
-  }]);
-
-}());
+        $scope.logout = () => {
+          $http.get('/backendServices/logout')
+            .then(() => {
+              $windowRef.location = '/';
+            });
+        };
+      }],
+  );
+})());

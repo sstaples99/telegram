@@ -1,510 +1,503 @@
-(function() {
-    var app = angular.module('telegram');
+const angular = require('angular');
+const $ = require('jquery');
+const _ = require('lodash');
+const swal = require('sweetalert');
+require('jquery-ui-bundle');
+require('jquery-datetimepicker');
 
-    app.controller('DashController', ["$scope", "$http", "$window", "Upload", "$timeout", "$routeParams", "$location", function($scope, $http, $window, Upload, $timeout, $routeParams, $location) {
+((() => {
+  const app = angular.module('telegram');
 
-        $scope.checkStatus = function() {
-            $http.get("/backendServices/isLoggedIn")
-                .then(function(res) {
-                    console.log(res.data);
-                    if (!res.data.loggedIn) $window.location = "/";
-                    else {
-                        $scope.userData.isLoggedIn = true;
-                        $http.get("/backendServices/getUser")
-                            .then(function(res) {
-                                if (res.data) $scope.userData.user = res.data;
-                                else console.log("Error: ", res.data.err);
-                            });
-                    }
-                });
-        };
-        $scope.pullEvents = function() {
-            $http.post("/backendServices/getEvents", $scope.pageData.active.org)
-                .then(function(res) {
-                    if (!res.data.success) console.log("Error loading events");
-                    else {
-                        $scope.pageData.content[$scope.pageData.active.org.uniqname].events = {
-                            data: res.data.data
-                        };
-                    }
-                });
-        };
-        $scope.getParties = function() {
-            $http.post("/backendServices/getParties", $scope.pageData.active.org)
-                .then(function(res) {
-                    if (!res.data.success) console.log("Error loading parties");
-                    else {
-                        $scope.pageData.content[$scope.pageData.active.org.uniqname].parties = {
-                            data: res.data.data
-                        };
-                    }
-                });
-        };
-        $scope.pullOrgs = function() {
-            $http.get("/backendServices/getOrgs")
-                .then(function(res) {
-                    if (!res.data) console.log("Error finding organizations");
-                    else {
-                        $scope.userData.orgs = res.data;
-                        for (var i = 0; i < $scope.userData.orgs.length; i++) {
-                            $scope.pageData.content[$scope.userData.orgs[i].uniqname] = {};
-                        }
-                        if ($routeParams.org) {
-                            var idx = $scope.userData.orgs.findIndex(function(o) { return o.uniqname == $routeParams.org });
-                            if (idx > -1) $scope.pageData.active.org = $scope.userData.orgs[idx];
-                        } else {
-                            $scope.pageData.active.org = $scope.userData.orgs[0];
-                            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname);
-                        }
-                        if ($routeParams.service) {
-                            var idx = $scope.pageData.active.org.services.indexOf($routeParams.service);
-                            if (idx > -1) $scope.pageData.active.service = $routeParams.service;
-                        } else {
-                            $scope.pageData.active.service = $scope.pageData.active.org.services[0];
-                            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname+"/"+$scope.pageData.active.service);
-                        }
-                    }
-                });
-        };
-        $scope.initMenus = function() {
-            $http.post("/backendServices/getMenus", $scope.pageData.active.org)
-                .then(function(res) {
-                    if (!res.data.success) {
-                        console.log(res.data.err);
-                    } else {
-                        $scope.pageData.content[$scope.pageData.active.org.uniqname].items = {
-                            data: res.data.data
-                        };
+  app.controller(
+    'DashController',
+    ['$scope',
+      '$http',
+      '$window',
+      'Upload',
+      '$timeout',
+      '$routeParams',
+      '$location',
+      function ( // eslint-disable-line func-names
+        $scope, $http, $window,
+        Upload, $timeout, $routeParams, $location,
+      ) {
+        const $windowRef = $window;
 
-                        $http.post("/backendServices/getTags", {clientID: $scope.pageData.active.org._id})
-                            .then(function(response) {
-                               if (response.data) {
-                                   var uniqMenuTags = response.data;
-                                   // var menuTagsShown = [];
-                                   // for (var i = 0; i < res.data.data.length; i++) {
-                                   //     var item = res.data.data[i];
-                                   //     for (var j = 0; j < item.tags.length; j++) {
-                                   //         if (uniqMenuTags.findIndex(function(o){return o.name === item.tags[j]}) < 0) {
-                                   //             var tag = {
-                                   //                 name: item.tags[j],
-                                   //                 clientID: $scope.pageData.active.org._id
-                                   //             };
-                                   //             uniqMenuTags.push(tag);
-                                   //             $http.post("/backendServices/createCard", {schema: 'tag', data: tag});
-                                   //         }
-                                   //     }
-                                   //
-                                   // }
-                                   // menuTagsShown.push(uniqMenuTags[0].name);
-                                   uniqMenuTags[0].active = true;
-                                   uniqMenuTags.unshift({
-                                     name: "all"
-                                   });
-                                   // $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown = menuTagsShown;
-                                   $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags = uniqMenuTags;
-                               }
-                            });
-                    }
-                });
-        };
-        $scope.uploadImg = function(item, schema) {
-            var file = item.imgFile;
-            file.upload = Upload.upload({
-                url: "/backendServices/uploadImg",
-                data: {file: file, _id: item._id, schema: schema}
-            });
-
-            file.upload.then(function(res) {
-                $timeout(function() {
-                    item.img = res.data;
-                });
-            }, function(res) {
-                if (res.status > 0) {
-                    $scope.errorMsg = res.status + ': ' + res.data;
-                }
-            }, function(evt) {
-                file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+        $scope.checkStatus = () => {
+          $http.get('/backendServices/user/isLoggedIn')
+            .then((res) => {
+              if (!res.data.loggedIn) {
+                $windowRef.location = '/';
+                return;
+              }
+              $scope.userData.isLoggedIn = true;
+              return $http.get('/backendServices/user/');
+            }).then((res) => {
+              if (res) {
+                if (res.data) $scope.userData.user = res.data;
+                else console.log('Error: could not validate user.');
+              }
             });
         };
 
-        $scope.updateCard = function(p, item) {
-            if (typeof item.tags == "string") {
-              item.tags = item.tags.split(",");
+        $scope.getEvents = () => {
+          $http.post('/backendServices/event/', $scope.pageData.active.org)
+            .then((res) => {
+              if (!res.data.success) console.log('Error loading events');
+              else {
+                const activeOrgName = $scope.pageData.active.org.uniqname;
+                $scope.pageData.content[activeOrgName].events = {
+                  data: res.data.data,
+                };
+              }
+            });
+        };
+
+        $scope.getParties = () => {
+          $http.post('/backendServices/party/', $scope.pageData.active.org)
+            .then((res) => {
+              if (!res.data.success) console.log('Error loading parties');
+              else {
+                const activeOrgName = $scope.pageData.active.org.uniqname;
+                $scope.pageData.content[activeOrgName].parties = {
+                  data: res.data.data,
+                };
+              }
+            });
+        };
+        $scope.getOrgs = () => {
+          $http.get('/backendServices/organization/')
+            .then((res) => {
+              if (!res.data) {
+                console.log('Error finding organizations');
+                return;
+              }
+              $scope.userData.orgs = res.data;
+              _.forEach($scope.userData.orgs, (org) => {
+                $scope.pageData.content[org.uniqname] = {};
+              });
+              if ($routeParams.org) {
+                const idx = $scope.userData.orgs.findIndex(o => o.uniqname === $routeParams.org);
+                if (idx > -1) $scope.pageData.active.org = $scope.userData.orgs[idx];
+              } else {
+                [$scope.pageData.active.org] = $scope.userData.orgs;
+                $location.path(`/dashboard/${$scope.pageData.active.org.uniqname}`);
+              }
+              if ($routeParams.service) {
+                const idx = $scope.pageData.active.org.services.indexOf($routeParams.service);
+                if (idx > -1) $scope.pageData.active.service = $routeParams.service;
+              } else {
+                [$scope.pageData.active.service] = $scope.pageData.active.org.services;
+                $location.path(`/dashboard/${$scope.pageData.active.org.uniqname}/${$scope.pageData.active.service}`);
+              }
+            });
+        };
+        $scope.initMenus = () => {
+          $http.post('/backendServices/menu/items', { clientID: $scope.pageData.active.org._id })
+            .then((res) => {
+              if (!res.data.success) {
+                console.log(res.data.err);
+              } else {
+                $scope.pageData.content[$scope.pageData.active.org.uniqname].items = {
+                  data: res.data.data,
+                };
+
+                $http.post('/backendServices/menu/', { clientID: $scope.pageData.active.org._id })
+                  .then((response) => {
+                    if (response.data) {
+                      const uniqMenuTags = response.data.data;
+                      uniqMenuTags[0].active = true;
+                      uniqMenuTags.unshift({
+                        name: 'all',
+                      });
+                      const activeOrgName = $scope.pageData.active.org.uniqname;
+                      $scope.pageData.content[activeOrgName].items.uniqMenuTags = uniqMenuTags;
+                    }
+                  });
+              }
+            });
+        };
+
+        $scope.uploadImg = (item, schema) => {
+          const itemRef = item;
+          const file = itemRef.imgFile;
+          file.upload = Upload.upload({
+            url: '/backendServices/upload/img',
+            data: {
+              file,
+              _id: itemRef._id,
+              schema,
+            },
+          });
+
+          file.upload.then((res) => {
+            const updatedData = {
+              _id: itemRef._id,
+              url: res.data.replace('www.dropbox', 'dl.dropboxusercontent'),
+            };
+            $http.post('/backendServices/card/update', { schema, data: updatedData })
+              .then((response) => {
+                $timeout(() => {
+                  itemRef.img = response.data.img;
+                });
+              });
+          }, (res) => {
+            if (res.status > 0) {
+              $scope.errorMsg = `${res.status}: ${res.data}`;
             }
-            var data = {
-                schema: p,
-                data: item
-            };
-            console.log(item);
-            $http.put("/backendServices/updateCard", data)
-                .then(function(res) {
-                    if (!res.data.success) console.log(res.data.err);
-                });
+          }, (evt) => {
+            file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total, 10));
+          });
         };
-        $scope.dupCard = function(p, item) {
-            var data = {
-                schema: p,
-                data: item
-            };
-            $http.post("/backendServices/dupCard", data)
-                .then(function(res) {
-                   if (res.data.success) {
-                       res.data.data.newCard = true;
-                       $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.unshift(res.data.data);
-                   } else {
-                       swal("Error", "Unfortunately, the document could not be duplicated", "error");
-                   }
-                });
+
+        $scope.updateCard = (p, item) => {
+          const itemRef = item;
+          if (_.isString(item.tags)) {
+            itemRef.tags = item.tags.split(',');
+          }
+          const data = {
+            schema: p,
+            data: item,
+          };
+          $http.put('/backendServices/card/', data)
+            .then((res) => {
+              if (!res.data.success) console.log(res.data.err);
+            });
         };
-        $scope.initCreateCard = function(p) {
+
+        $scope.duplicateCard = (p, item) => {
+          const data = {
+            schema: p,
+            data: item,
+          };
+          $http.post('/backendServices/card/duplicate', data)
+            .then((res) => {
+              if (res.data.success) {
+                res.data.data.newCard = true;
+                const activeOrgName = $scope.pageData.active.org.uniqname;
+                $scope.pageData
+                  .content[activeOrgName][`${p}s`]
+                  .data.unshift(res.data.data);
+              } else {
+                swal('Error', 'Unfortunately, the document could not be duplicated', 'error');
+              }
+            });
+        };
+
+        $scope.initCreateCard = () => {
           $scope.evInit = {
-            img: "/img/icons/unknown.png"
-          }
-          $("#ev-overlay").addClass("show-block");
-          $("#init-card").addClass("show-block");
-        }
-        $scope.clearOverlays = function() {
-          $("#ev-overlay").removeClass("show-block");
-          $("#init-card").removeClass("show-block");
-          $("#tag-settings").removeClass("show-block");
-        }
-        $scope.createCard = function(p) {
-            if ($scope.evInit.tags && typeof $scope.evInit.tags == "string") {
-              $scope.evInit.tags = $scope.evInit.tags.split(",");
-            }
-            var data = {
-                schema: p,
-                data: $scope.evInit
-            }
-            data.data.clientID = $scope.pageData.active.org._id;
-            $http.post("/backendServices/createCard", data)
-                .then(function(res) {
-                    if (res.data.success) {
-                      $scope.clearOverlays();
-                      $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.push(res.data.data);
-                      $("#evbox-" + res.data.data._id).addClass("new-card");
-                    }
-                });
+            img: '/img/icons/unknown.png',
+          };
+          $('#ev-overlay').addClass('show-block');
+          $('#init-card').addClass('show-block');
         };
-        $scope.deleteCard = function(p, item) {
-            var data = {
-                schema: p,
-                data: item
-            };
-            swal({
-                    title: "Are you sure?",
-                    text: "You will not be able to recover this document!",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes, delete it!",
-                    closeOnConfirm: false
-                }, function() {
-                    $http.post("/backendServices/deleteCard", data)
-                        .then(function(res) {
-                            if (!res.data) {
-                                swal("Error", "Unfortunately, the document could not be deleted", "error");
-                            } else {
-                                var idx = -1;
-                                for (var i = 0; i < $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.length; ++i) {
-                                  if ($scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data[i]._id == item._id) {
-                                    idx = i;
-                                    break;
-                                  }
-                                }
-                                $scope.pageData.content[$scope.pageData.active.org.uniqname][p + "s"].data.splice(idx,1);
-                                swal("Success", "the " + p + " was deleted", "success");
-                            }
-                        });
+
+        $scope.clearOverlays = () => {
+          $('#ev-overlay').removeClass('show-block');
+          $('#init-card').removeClass('show-block');
+          $('#tag-settings').removeClass('show-block');
+        };
+
+        $scope.createCard = (p) => {
+          if ($scope.evInit.tags && _.isString($scope.evInit.tags)) {
+            $scope.evInit.tags = $scope.evInit.tags.split(',');
+          }
+          const data = {
+            schema: p,
+            data: $scope.evInit,
+          };
+          data.data.clientID = $scope.pageData.active.org._id;
+          $http.post('/backendServices/card/', data)
+            .then((res) => {
+              if (res.data.success) {
+                $scope.clearOverlays();
+                const activeOrgName = $scope.pageData.active.org.uniqname;
+                $scope.pageData.content[activeOrgName][`${p}s`].data.push(res.data.data);
+                $(`#evbox-${res.data.data._id}`).addClass('new-card');
+              }
             });
         };
 
-        var sortArray = function(oArr) {
-            var arr = JSON.parse(JSON.stringify(oArr));
-            for (var i = 0; i < arr.length; i++) {
-                for (var j = 0; j < arr.length - i - 1; j++) {
-                    if (arr[j].order > arr[j+1].order) {
-                        var temp = arr[j];
-                        arr[j] = arr[j+1];
-                        arr[j+1] = temp;
-                    }
+        $scope.deleteCard = (schema, item) => {
+          const data = {
+            schema,
+            data: item,
+          };
+          swal({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this document!',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, delete it!',
+            closeOnConfirm: false,
+          }).then(() => {
+            $http.post('/backendServices/card/delete', data)
+              .then((res) => {
+                if (!res.data.success) {
+                  swal('Error', 'Unfortunately, the document could not be deleted', 'error');
+                } else {
+                  const activeOrgName = $scope.pageData.active.org.uniqname;
+                  const currentContent = $scope.pageData.content[activeOrgName][`${schema}s`].data;
+                  _.remove(currentContent, obj => obj._id === item._id);
+                  swal('Success', `the ${schema} was deleted`, 'success');
                 }
-            }
-            return arr;
+              });
+          });
         };
-        var minOrder = function(arr) {
-          var min = arr[0].order;
-          for (var i = 1; i < arr.length; i++) {
-              if (arr[i].order < min) min = arr[i].order;
+
+        $scope.toggleService = (s) => {
+          $location.path(`/dashboard/${$scope.pageData.active.org.uniqname}/${s}`);
+          $scope.pageData.active.service = s;
+        };
+
+        $scope.toggleOrg = (o) => {
+          $scope.pageData.active = {
+            org: o,
+          };
+          $location.path(`/dashboard/${o.uniqname}`);
+        };
+
+        $scope.toggleOrgNav = () => {
+          $('#ent-nav').toggleClass('slide-block');
+          $('.pane-body').toggleClass('col-10').toggleClass('col-9');
+        };
+
+        $scope.rotateOrg = () => {
+          const userOrgs = $scope.userData.orgs;
+          let activeOrg = $scope.pageData.active.org;
+          const newOrgIdx = (userOrgs.indexOf(activeOrg) + 1) % userOrgs.length;
+          activeOrg = userOrgs[newOrgIdx];
+          $location.path(`/dashboard/${activeOrg.uniqname}`);
+        };
+
+        $scope.toggleCard = (id) => {
+          $(`#edits-${id}`).slideToggle();
+        };
+
+        $scope.toggleTag = (tag) => {
+          const tagRef = tag;
+          const activeOrgName = $scope.pageData.active.org.uniqname;
+          const pageContent = $scope.pageData.content[activeOrgName];
+          tagRef.active = !tagRef.active;
+          const idx = pageContent.items.tagsShown.findIndex(o => o === tag.name);
+          if (idx < 0) {
+            pageContent.items.tagsShown.push(tag.name);
+          } else {
+            delete pageContent.items.tagsShown[idx];
           }
-          return min;
-        };
-        var maxOrder = function(arr) {
-            var max = arr[0].order;
-            for (var i = 1; i < arr.length; i++) {
-                if (arr[i].order > max) max = arr[i].order;
-            }
-            return max;
-        };
-        var setServiceParam = function(str) {
-            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname+"/"+str);
         };
 
-        $scope.toggleService = function(s) {
-            setServiceParam(s);
-            $scope.pageData.active.service = s;
+        $scope.tagShown = (tag) => {
+          const tagRef = tag;
+          if ($scope.itemSelectionKey.name === 'all') return true;
+          if (_.isString(tagRef.tags)) {
+            tagRef.tags = tagRef.tags.split(',');
+          }
+          if (_.includes(tagRef.tags, $scope.itemSelectionKey.name)) return true;
+          return false;
         };
-        $scope.toggleOrg = function(o) {
-            $scope.pageData.active = {
-                org: o
-            };
-            $location.path("/dashboard/"+o.uniqname);
+
+        $scope.removeActiveTag = () => {
+          delete $scope.pageData.active.tag;
         };
-        $scope.toggleOrgNav = function() {
-          $("#ent-nav").toggleClass("slide-block");
-          $(".pane-body").toggleClass("col-10").toggleClass("col-9");
-        }
-        $scope.rotateOrg = function() {
-            $scope.pageData.active = {
-                org: $scope.userData.orgs[($scope.userData.orgs.indexOf($scope.pageData.active.org) + 1) % $scope.userData.orgs.length]
-            };
-            $location.path("/dashboard/"+$scope.pageData.active.org.uniqname);
-        };
-        $scope.toggleCard = function(id) {
-            $("#edits-" + id).slideToggle();
-        };
-        $scope.toggleTag = function(tag) {
-            tag.active = !tag.active;
-            var idx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.findIndex(function(o) { return o === tag.name});
-            if (idx < 0) $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown.push(tag.name);
-            else delete $scope.pageData.content[$scope.pageData.active.org.uniqname].items.tagsShown[idx];
-        };
-        $scope.tagShown = function(tag) {
-            if ($scope.itemSelectionKey.name == "all") return true;
-            if (typeof tag.tags == "string") {
-              tag.tags = tag.tags.split(",");
+
+        $scope.updateTag = () => {
+          const activeTag = $scope.pageData.active.tag;
+          const activeOrgName = $scope.pageData.active.org.uniqname;
+          const pageContent = $scope.pageData.content[activeOrgName];
+          if (activeTag.placeholder === activeTag.name) return;
+          _.forEach(pageContent.items.data, (item) => {
+            const itemRef = item;
+            const idx = _.findIndex(item.tags, activeTag.name);
+            if (idx > -1) {
+              itemRef.tags[idx] = activeTag.placeholder;
+              $http.put('/backendServices/card/', { schema: 'item', data: item });
             }
-            for (var i = 0; i < tag.tags.length; i++) {
-                if (tag.tags[i] == $scope.itemSelectionKey.name) return true;
-            }
-            return false;
+          });
+          activeTag.name = activeTag.placeholder;
+          $http.put('/backendServices/card/', { schema: 'tag', data: activeTag });
         };
-        $scope.removeActiveTag = function() {
-            delete $scope.pageData.active['tag'];
-        };
-        $scope.updateTag = function() {
-            if ($scope.pageData.active.tag.placeholder === $scope.pageData.active.tag.name) return;
-            for (var i = 0; i < $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length; i++) {
-                var item = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[i];
-                var idx = item.tags.indexOf($scope.pageData.active.tag.name);
-                if (idx > -1) {
-                    item.tags[idx] = $scope.pageData.active.tag.placeholder;
-                    $http.put("/backendServices/updateCard", {schema: 'item', data: item});
+
+        $scope.deleteTag = (tag) => {
+          const data = {
+            schema: 'tag',
+            data: tag,
+          };
+          swal({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this document!',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, delete it!',
+            closeOnConfirm: false,
+          }, () => {
+            $http.post('/backendServices/card/delete', data)
+              .then((res) => {
+                if (!res.data.data) {
+                  swal('Error', 'Unfortunately, the document could not be deleted', 'error');
+                } else {
+                  const activeOrgName = $scope.pageData.active.org.uniqname;
+                  const pageContent = $scope.pageData.content[activeOrgName];
+                  const pageMenuTags = pageContent.items.uniqMenuTags;
+                  _.remove(pageMenuTags, o => o.name === res.data.data.name);
+                  swal('Success', 'the tag was deleted', 'success');
+
+                  _.forEach(pageContent.items.data, (item) => {
+                    const itemRef = item;
+                    if (_.isString(itemRef.tags)) itemRef.tags = item.tags.split(',');
+                    const activeTagName = $scope.pageData.active.tag.name;
+                    const removedTags = _.remove(itemRef.tags, o => o === activeTagName);
+                    if (_.size(removedTags) > 0) {
+                      $http.put('/backendServices/card/', { schema: 'item', data: item });
+                    }
+                  });
                 }
-            }
-            $scope.pageData.active.tag.name = $scope.pageData.active.tag.placeholder;
-            $http.put("/backendServices/updateCard", {schema: 'tag', data: $scope.pageData.active.tag});
-        };
-        $scope.deleteTag = function(tag) {
-            var data = {
-                schema: 'tag',
-                data: tag
-            };
-            swal({
-                title: "Are you sure?",
-                text: "You will not be able to recover this document!",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, delete it!",
-                closeOnConfirm: false
-            }, function() {
-                $http.post("/backendServices/deleteCard", data)
-                    .then(function(res) {
-                        console.log(res);
-                        if (!res.data.data) {
-                            swal("Error", "Unfortunately, the document could not be deleted", "error");
-                        } else {
-                            var idx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.findIndex(function(o) {return o.name == res.data.data.name});
-                            $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.splice(idx,1);
-                            swal("Success", "the tag was deleted", "success");
-
-                            for (var i = 0; i < $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length; i++) {
-                                var item = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[i];
-                                var idx = item.tags.indexOf($scope.pageData.active.tag.name);
-                                if (idx > -1) {
-                                    item.tags.splice(idx, 1);
-                                    $http.put("/backendServices/updateCard", {schema: 'item', data: item});
-                                }
-                            }
-                        }
-                    });
-            });
-        };
-        $scope.dropCallback = function(idx, item) {
-            var pidx = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.placeholder;
-            if (pidx < idx) idx -= 1;
-            console.log(idx);
-            if (idx == $scope.pageData.content[$scope.pageData.active.org.uniqname].items.placeholder) return;
-
-            if (idx == 0) item.order = minOrder($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data) - 1;
-            else if (idx == $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data.length - 2) item.order = maxOrder($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data) + 1;
-            else {
-                var prev = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[idx - 1].order;
-                var next = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data[idx + 1].order;
-                var mid = (next - prev) * 0.95;
-                item.order = prev + mid;
-            }
-            console.log(item.order);
-            $scope.updateCard('item', item);
-            $scope.pageData.content[$scope.pageData.active.org.uniqname].items.data = sortArray($scope.pageData.content[$scope.pageData.active.org.uniqname].items.data);
+              });
+          });
         };
 
-        $scope.updateCardFilter = function(key) {
+        $scope.dropCallback = (idx, item) => {
+          const itemRef = item;
+          const activeOrgName = $scope.pageData.active.org.uniqname;
+          const pageContent = $scope.pageData.content[activeOrgName];
+          const pidx = pageContent.items.placeholder;
+          if (pidx < idx) idx -= 1; // eslint-disable-line no-param-reassign
+          else if (idx === pidx) {
+            return;
+          }
+
+          if (idx === 0) {
+            itemRef.order = _.minBy(pageContent.items.data, o => o.order).order - 1;
+          } else if (idx === pageContent.items.data.length - 2) {
+            itemRef.order = _.maxBy(pageContent.items.data, o => o.order).order + 1;
+          } else {
+            const prev = pageContent.items.data[idx - 1].order;
+            const next = pageContent.items.data[idx + 1].order;
+            const mid = (next - prev) * 0.95;
+            itemRef.order = prev + mid;
+          }
+          $scope.updateCard('item', item);
+          pageContent.items.data = _.sortBy(pageContent.items.data, ['order']);
+        };
+
+        $scope.updateCardFilter = (key) => {
           $scope.eventOrdering = $scope.possibleEventOrderings[key];
-        }
-        $scope.updateItemCardFilter = function(key) {
+        };
+
+        $scope.updateItemCardFilter = (key) => {
           $scope.itemSelectionKey.name = key.name;
-        }
+        };
 
         $scope.possibleEventOrderings = {
-          "dateN": {
-            field: "start",
-            reverse: true
+          dateN: {
+            field: 'start',
+            reverse: true,
           },
-          "dateO": {
-            field: "start",
-            reverse: false
+          dateO: {
+            field: 'start',
+            reverse: false,
           },
-          "featured": {
-            field: "featured",
-            reverse: true
+          featured: {
+            field: 'featured',
+            reverse: true,
           },
-          "title":{
-              field: "title",
-              reverse: false
-          }
-        }
-        $scope.eventOrderKey = "dateN";
-        $scope.eventOrdering = $scope.possibleEventOrderings["dateN"];
+          title: {
+            field: 'title',
+            reverse: false,
+          },
+        };
+        $scope.eventOrderKey = 'dateN';
+        $scope.eventOrdering = $scope.possibleEventOrderings.dateN;
 
         $scope.itemSelectionKey = {
-          name: "all"
+          name: 'all',
         };
 
-        $scope.displayTagSettings = function() {
-          $("#tag-settings").addClass("show-block");
-          $("#ev-overlay").addClass("show-block");
-        }
+        $scope.displayTagSettings = () => {
+          $('#tag-settings').addClass('show-block');
+          $('#ev-overlay').addClass('show-block');
+        };
 
-        $scope.createMenuTag = function(tag, header) {
+        $scope.createMenuTag = (tag, header) => {
           if (!tag) return;
-          var tag = {
+          const tag1 = {
             name: tag,
             id: tag.replace(/\W/g, ''),
-            header_img: header || "http://www.caseysnewbuffalo.com/img/backgrounds/brunch.jpg",
-            clientID: $scope.pageData.active.org._id
+            header_img: header || 'http://www.caseysnewbuffalo.com/img/backgrounds/brunch.jpg',
+            clientID: $scope.pageData.active.org._id,
           };
-          var postData = {
-            schema: "tag",
-            data: tag
+          const postData = {
+            schema: 'tag',
+            data: tag1,
           };
 
-          $.post("/backendServices/createCard", postData)
-            .then(function(res) {
-                if (res.success) {
-                  $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags.splice(1,0,res.data);
-                  $scope.$apply();
-                } else {
-                  console.log("ay");
-                }
-            });
-        }
-
-        $scope.createTagSubmenu = function(submenuTxt, tagID) {
-          $.post("/backendServices/addSubmenu", {menuID: tagID, submenuText: submenuTxt})
-            .then(function(res) {
+          $.post('/backendServices/card', postData)
+            .then((res) => {
               if (res.success) {
-                var idx = 0;
-                var uniqTags = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags;
-                for (var i = 0; i < uniqTags.length; ++i) {
-                  if (uniqTags[i]._id == tagID)
-                    idx = i;
-                }
-                $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags[idx].submenus.push(submenuTxt);
+                const activeOrgName = $scope.pageData.active.org.uniqname;
+                const pageContent = $scope.pageData.content[activeOrgName];
+                pageContent.items.uniqMenuTags.splice(1, 0, res.data);
                 $scope.$apply();
-              } else {
-                console.log(res.err);
               }
             });
-        }
-
-        $scope.removeSubmenu = function(submenuTxt, tagID) {
-          $.post("/backendServices/removeSubmenu", {menuID: tagID, submenuText: submenuTxt})
-            .then(function(res) {
-              if (res.success) {
-                var idx = 0;
-                var uniqTags = $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags;
-                for (var i = 0; i < uniqTags.length; ++i) {
-                  if (uniqTags[i]._id == tagID)
-                    idx = i;
-                }
-                var submenuIdx = 0;
-                for (var i = 0; i < uniqTags[idx].submenus.length; ++i) {
-                  if (uniqTags[idx].submenus[i] == submenuTxt)
-                    submenuIdx = i;
-                }
-                $scope.pageData.content[$scope.pageData.active.org.uniqname].items.uniqMenuTags[idx].submenus.splice(submenuIdx, 1);
-                $scope.$apply();
-              } else {
-                console.log(res.err);
-              }
-            });
-        }
-
-
-
-    }]);
-
-    app.filter('dateInMillis', function() {
-        return function(dateString) {
-            return Date.parse(dateString);
         };
-    });
-    app.directive("dpLoad", function() {
-       return {
-           restrict: "A",
-           link: function(scope, el, attrs) {
-               $(el).datetimepicker();
-           }
-       }
-    });
-    app.directive("clToggle", function() {
-        return {
-            restrict: "A",
-            link: function(scope, el, attrs) {
-                $(el).click(function() {
-                   $(this).toggleClass("is-active");
-                   $($(this).attr("data-target-left")).toggleClass("nav-active");
-                   $($(this).attr("data-target-right")).toggleClass("body-active");
-                });
-            }
-        }
-    });
-    app.directive("ntToggle", function() {
-        return {
-            restrict: "A",
-            link: function(scope, el, attrs) {
-                $(el).click(function() {
-                    var drop = new Drop({
-                        target: $("#test"),
-                        content: 'Welcome to the future!',
-                        position: 'bottom left',
-                        openOn: 'click'
-                    });
-                    alert("wassup 1");
-                });
-            }
-        }
-    });
-}());
+
+        $scope.createTagSubmenu = (submenuTxt, tagID) => {
+          $.post('/backendServices/submenu', { menuID: tagID, submenuText: submenuTxt })
+            .then((res) => {
+              if (res.success) {
+                const activeOrgName = $scope.pageData.active.org.uniqname;
+                const pageContent = $scope.pageData.content[activeOrgName];
+                const uniqTags = pageContent.items.uniqMenuTags;
+                const idx = _.findLastIndex(uniqTags, tag => tag._id === tagID);
+                uniqTags[idx].submenus.push(submenuTxt);
+                $scope.$apply();
+              } else {
+                console.log(res.err);
+              }
+            });
+        };
+
+        $scope.removeSubmenu = (submenuTxt, tagID) => {
+          $.post('/backendServices/submenu/delete', { menuID: tagID, submenuText: submenuTxt })
+            .then((res) => {
+              if (res.success) {
+                const activeOrgName = $scope.pageData.active.org.uniqname;
+                const pageContent = $scope.pageData.content[activeOrgName];
+                const uniqTags = pageContent.items.uniqMenuTags;
+                const idx = _.findLastIndex(uniqTags, tag => tag._id === tagID);
+                const submenuIdx = _.findLastIndex(uniqTags[idx].submenus, sm => sm === submenuTxt);
+                uniqTags[idx].submenus.splice(submenuIdx, 1);
+                $scope.$apply();
+              } else {
+                console.log(res.err);
+              }
+            });
+        };
+      }],
+  );
+
+  app.filter('dateInMillis', () => dateString => Date.parse(dateString));
+
+  app.directive('dpLoad', () =>
+    ({
+      restrict: 'A',
+      link: (scope, el) => {
+        $(el).datetimepicker();
+      },
+    }));
+
+  app.directive('clToggle', () =>
+    ({
+      restrict: 'A',
+      link: (scope, el) => {
+        $(el).click((evt) => {
+          $(evt.currentTarget).toggleClass('is-active');
+          $($(evt.currentTarget).attr('data-target-left')).toggleClass('nav-active');
+          $($(evt.currentTarget).attr('data-target-right')).toggleClass('body-active');
+        });
+      },
+    }));
+})());
