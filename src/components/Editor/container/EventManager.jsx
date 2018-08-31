@@ -12,7 +12,7 @@ class EventManager extends React.Component {
     this.state = {
       events: [],
       searchQuery: '',
-      cardSortMethod: 'title',
+      cardSortMethod: 'dateN',
     };
     this.createNewCard = this.createNewCard.bind(this);
     this.onEventChange = this.onEventChange.bind(this);
