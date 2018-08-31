@@ -7,7 +7,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      user: { authed: true },
+      user: { authed: false },
     };
 
     this.login = this.login.bind(this);
