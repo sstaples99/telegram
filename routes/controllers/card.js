@@ -26,19 +26,19 @@ const createCard = (schema, data, duplicate) =>
         item.order = count;
         item.save((err, doc) => {
           if (err) {
-            console.log(err);
             return reject(err);
           }
           return resolve(doc);
         });
-      }).catch(err => ({ success: false, err }));
+      }).catch(err => resolve({ success: false, err }));
   });
 
 const updateCard = (schema, data) =>
   new Promise((resolve, reject) => {
     const { _id } = data;
+    const updatedData = _.omit(data, '__v');
     const Schema = schemas[schema];
-    Schema.findOneAndUpdate({ _id }, data, { upsert: true, new: true }, (err, doc) => {
+    Schema.findOneAndUpdate({ _id }, updatedData, { upsert: true, new: true }, (err, doc) => {
       if (err) {
         return reject(err);
       }
@@ -46,15 +46,14 @@ const updateCard = (schema, data) =>
     });
   });
 
-const deleteCard = (schema, data) =>
+const deleteCard = (schema, _id) =>
   new Promise((resolve, reject) => {
-    const { _id } = data;
     const Schema = schemas[schema];
     Schema.find({ _id }).remove((err) => {
       if (err) {
         return reject(err);
       }
-      return resolve(data);
+      return resolve(_id);
     });
   });
 

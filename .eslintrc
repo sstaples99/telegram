@@ -1,9 +1,20 @@
 {
-  "extends": "airbnb-base",
+  "extends": "airbnb",
   "rules": {
     "consistent-return": 0,
     "no-underscore-dangle": 0,
     "no-console": 0,
-    "implicit-arrow-linebreak": 0
+    "implicit-arrow-linebreak": 0,
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/prefer-stateless-function": [0, true]
+  },
+  "plugins": [ "react" ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
   }
 }

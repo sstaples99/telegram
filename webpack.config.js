@@ -3,10 +3,10 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    index: './public/js/index.js',
+    index: './src/index.js',
   },
   output: {
-    filename: '[name]-bundle.js',
+    filename: 'react-bundle.js',
     path: path.resolve(__dirname, 'public/js/dist'),
   },
   mode: 'development',
@@ -16,4 +16,18 @@ module.exports = {
       jQuery: 'jquery',
     }),
   ],
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
 };

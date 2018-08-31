@@ -1,0 +1,6 @@
+{
+  "globals": {
+    "document": true,
+    "FormData": true
+  }
+}

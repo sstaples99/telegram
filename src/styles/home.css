@@ -5,18 +5,6 @@
 li {
     list-style-type: none !important;
 }
-a {
-  text-decoration: none;
-  color: #111;
-}
-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-button:focus, input:focus {
-  outline: 0;
-}
 .panel {
     background-color: #ddd;
     border-radius: 10px;
@@ -150,8 +138,6 @@ button.btn-round {
     -ms-transition: width 0.5s;
     -o-transition: width 0.5s;
     transition: width 0.5s;
-    height: 100vh;
-    overflow: auto;
 }
 
 .desktop-item {
@@ -279,19 +265,10 @@ button.btn-round {
     float: right;
 }
 .card-edits {
-    padding: 0;
+    padding: 20px 10px;
     float: left;
     width: 100%;
-    overflow: hidden;
-    height: 0px;
-    transition: height .3s ease-in;
-    -webkit-transition: height .3s ease-in;
-}
-.card-edits.open {
-  height: auto;
-}
-.edits-container {
-  padding: 20px 10px;
+    display: none;
 }
 
 span.addon:last-child, input.addon:last-child {
@@ -313,14 +290,14 @@ span.addon {
 span.addon-wide {
     width: 120px;
 }
-div.addon:not(:first-child) {
+input.addon:not(:first-child) {
     border-left: 0
 }
 
-div.addon:not(:last-child) {
+input.addon:not(:last-child) {
     border-right: 0
 }
-div.addon {
+input.addon {
     -webkit-box-flex: 1;
     -webkit-flex: 1;
     -ms-flex: 1;
@@ -691,9 +668,6 @@ input.form-modern {
   animation-name: newCardAnimation;
   animation-duration: 2s;
   animation-timing-function: cubic-bezier(0,1,1,1);
-}
-.rdt {
-  position: static !important;
 }
 
 @media (min-width: 992px) {

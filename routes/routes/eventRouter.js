@@ -5,7 +5,7 @@ const eventSchema = require('../../models/event');
 const expressRouter = express.Router();
 
 expressRouter.post('/', (req, res) => {
-  eventSchema.find({ clientID: req.body._id }, {}, (err, events) => {
+  eventSchema.find({ clientID: req.body.clientID }, {}, (err, events) => {
     if (events) {
       res.send({ success: true, data: events });
     } else {

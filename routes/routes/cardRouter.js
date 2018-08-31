@@ -23,7 +23,7 @@ cardRouter.put('/', (req, res) =>
     .catch(err => res.send({ success: false, err })));
 
 cardRouter.post('/delete', (req, res) =>
-  deleteCard(req.body.schema, req.body.data)
+  deleteCard(req.body.schema, req.body._id)
     .then(results => res.send({ success: true, data: results }))
     .catch(err => res.send({ success: false, err })));
 
