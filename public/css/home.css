@@ -695,6 +695,9 @@ input.form-modern {
 .rdt {
   position: static !important;
 }
+.card-wrapper {
+  position: relative !important;
+}
 
 @media (min-width: 992px) {
 

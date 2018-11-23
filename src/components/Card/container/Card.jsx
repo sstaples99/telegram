@@ -57,39 +57,41 @@ class Card extends React.Component {
       deleteCard,
     } = this.props;
     return (
-      <div className="card-min box">
-        <div className="card-display">
-          <h2>
-            <button type="button" onClick={toggleCard}>
-              {title}
-              <span className="text-light pad-left">
-                { formatDate(start) }
-              </span>
-            </button>
-          </h2>
-          <div className="card-tools">
-            <input
-              id={`fav-${_id}`}
-              className="fav"
-              name="featured"
-              type="checkbox"
-              checked={featured}
-              onChange={this.checkAndUpdate}
-            />
-            <label htmlFor={`fav-${_id}`} className="fav" />
-            <button type="button" onClick={() => duplicateCard(_id)}>
-              <img
-                className="duplicate"
-                alt=""
-                src="/img/icons/dup.svg"
+      <div className="card-wrapper">
+        <div className="card-min box">
+          <div className="card-display">
+            <h2>
+              <button type="button" onClick={toggleCard}>
+                {title}
+                <span className="text-light pad-left">
+                  { formatDate(start) }
+                </span>
+              </button>
+            </h2>
+            <div className="card-tools">
+              <input
+                id={`fav-${_id}`}
+                className="fav"
+                name="featured"
+                type="checkbox"
+                checked={featured}
+                onChange={this.checkAndUpdate}
               />
-            </button>
-            <button type="button" onClick={() => deleteCard(_id)}>
-              <img className="delete" alt="" src="/img/icons/trash-1.svg" />
-            </button>
+              <label htmlFor={`fav-${_id}`} className="fav" />
+              <button type="button" onClick={() => duplicateCard(_id)}>
+                <img
+                  className="duplicate"
+                  alt=""
+                  src="/img/icons/dup.svg"
+                />
+              </button>
+              <button type="button" onClick={() => deleteCard(_id)}>
+                <img className="delete" alt="" src="/img/icons/trash-1.svg" />
+              </button>
+            </div>
           </div>
+          <EditCardForm {...this.props} />
         </div>
-        <EditCardForm {...this.props} />
       </div>
     );
   }
