@@ -17,7 +17,7 @@ class ManagerNav extends React.Component {
       createNewCard,
     } = this.props;
     return (
-      <div>
+      <div style={{ overflow: 'auto' }}>
         <NewEventCard createNewCard={createNewCard} />
         <div className="input-group search-group">
           <input type="text" className="search-bar" placeholder="Search" onChange={onSearchChange} value={searchQuery} />

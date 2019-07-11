@@ -100,7 +100,12 @@ class EventManager extends React.Component {
               }
             });
         } else {
-          swal(res.data.err.name, res.data.err.message, 'error');
+          if (res.data.err) {
+            swal(res.data.err.name, res.data.err.message, 'error');
+          } else {
+            console.log(res.data);
+            swal('Error', 'Something went wrong', 'error');
+          }
         }
       });
   }

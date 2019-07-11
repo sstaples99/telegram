@@ -552,6 +552,7 @@ input.form-modern {
   box-shadow: 0 0 10px #555;
   border-radius: 10px;
   display: none;
+  z-index: 99999;
 }
 .modal-save {
   border: none;
@@ -570,6 +571,7 @@ input.form-modern {
   height: 100vh;
   background-color: rgba(0,0,0,0.4);
   display: none;
+  z-index: 1;
 }
 .search-bar {
   width: 200px !important;

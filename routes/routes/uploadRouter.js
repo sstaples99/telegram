@@ -22,7 +22,7 @@ uploadRouter.post('/img', (req, res) => {
     readFile(files.file[0].path)
       .then(data => uploadToDropboxAndGetShareLink(`/uploads/${files.file[0].originalFilename}`, data))
       .then(result => res.send({ success: true, data: result }))
-      .catch(err1 => res.send({ success: false, err1 }));
+      .catch(err1 => res.send({ success: false, err: err1 }));
   });
 });
 
