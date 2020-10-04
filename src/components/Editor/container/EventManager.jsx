@@ -82,13 +82,13 @@ class EventManager extends React.Component {
     formData.append('file', imageToUpload.files[0]);
     formData.append('filename', imageToUpload.files[0].name);
 
-    axios.post('backendServices/upload/img/', formData)
+    axios.post('backendServices/upload/img/', formData, { headers: { 'Content-Type': 'multipart/form-data' }})
       .then((res) => {
         if (res.data.success) {
           const { events } = this.state;
           const updatedEvents = _.cloneDeep(events);
           const eventToUpdate = _.find(updatedEvents, e => e._id === _id);
-          eventToUpdate.img = res.data.data.url.replace('www.dropbox', 'dl.dropboxusercontent');
+          eventToUpdate.img = res.data.data;
           axios.put('backendServices/card/', { schema: 'event', data: eventToUpdate })
             .then((response) => {
               if (!response.data.success) {

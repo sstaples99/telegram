@@ -7,6 +7,7 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const passport = require('passport');
+const multer = require('multer');
 
 const routes = require('./routes/index');
 

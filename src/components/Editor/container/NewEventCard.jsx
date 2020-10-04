@@ -50,7 +50,7 @@ class NewEventCard extends React.Component {
       .then((res) => {
         if (res.data.success) {
           this.setState({
-            img: res.data.data.url.replace('www.dropbox', 'dl.dropboxusercontent'),
+            img: res.data.data,
           });
         } else {
           swal(res.data.err.name, res.data.err.message, 'error');
